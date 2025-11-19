@@ -46,6 +46,7 @@ const sq2coord = {
   37: 'a1', 38: 'c1', 39: 'e1', 40: 'g1',
 }
 
+
 function printBoard() {
   let boardStr = '';
   let pieces = ['#', '', '', '', '', 'o', 'x', '', '', 'O', 'X', '',  '', '', '', '', '.'];
@@ -67,9 +68,53 @@ function initBoard() {
   for(let sq = 9; sq <= 36; sq += 9) board[sq] = OFFBOARD;
 }
 
-initBoard();
-printBoard();
+function createMove() {
+  return {l: 0, m: new Array(10), path: new Array(10)};
+}
 
+function generateQuiets(color) {
+  let m = 0;
+  let quiets = [];
+  if (color == BLACK) {
+    for (let sq = 5; sq <= 40; sq++) {
+      if ((board[sq] & BLACK) != 0) {
+        if ((board[sq] & MAN) != 0) {
+          // +4 Move up & left
+          if ((board[sq+4] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            if (sq > 32) m = (BLACK|KING); else m = (BLACK|MAN);
+            m = m << 8;  m += (sq + 4); move.m[1] = m;
+            m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move)
+          }
+        }
+      }
+    }
+  } return quiets;
+}
+
+function makeMove(move) {
+  let sq, after;
+  sq = move.m[0] & 255;
+  console.log(sq2coord[sq])
+  
+  sq = move.m[1] & 255;
+  
+}
+
+initBoard();
+
+
+board[coord2sq['d4']] = BLACK|MAN
+
+// +5 down left
+
+
+//board[   coord2sq['d4'] - 5   ] = BLACK|MAN
+
+
+printBoard();
+generateQuiets(BLACK);
 
 
 
