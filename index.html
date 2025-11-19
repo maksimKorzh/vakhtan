@@ -7,7 +7,6 @@ const KING = 8
 const EMPTY = 16
 const CHANGECOLOR = 3
 
-
 // 5s go from right to left
 // 6s go from left to right
 
@@ -20,52 +19,92 @@ const CHANGECOLOR = 3
 
 // in my view
 // -5 Capture Down and Left 
- 
 
-var board = new Array(46);
+var b = new Array(46);
+var board = [ // white on the right, black on the left
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5],
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5],
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5],
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5]
 
-const coord2sq = {
-  'b8': 5,  'd8': 6, 'f8': 7, 'h8': 8,
-  'a7': 10, 'c7': 11, 'e7': 12, 'g7': 13,
-  'b6': 14, 'd6': 15, 'f6': 16, 'h6': 17,
-  'a5': 19, 'c5': 20, 'e5': 21, 'g5': 22,
-  'b4': 23, 'd4': 24, 'f4': 25, 'h4': 26,
-  'a3': 28, 'c3': 29, 'e3': 30, 'g3': 31,
-  'b2': 32, 'd2': 33, 'f2': 34, 'h2': 35,
-  'a1': 37, 'c1': 38, 'e1': 39, 'g1': 40,
-};
+  /*[0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 6, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0]*/
+];
 
-const sq2coord = {
-  5:  'b8', 6:  'd8', 7:  'f8', 8:  'h8',
-  10: 'a7', 11: 'c7', 12: 'e7', 13: 'g7',
-  14: 'b6', 15: 'd6', 16: 'f6', 17: 'h6',
-  19: 'a5', 20: 'c5', 21: 'e5', 22: 'g5',
-  23: 'b4', 24: 'd4', 25: 'f4', 26: 'h4',
-  28: 'a3', 29: 'c3', 30: 'e3', 31: 'g3',
-  32: 'b2', 33: 'd2', 34: 'f2', 35: 'h2',
-  37: 'a1', 38: 'c1', 39: 'e1', 40: 'g1',
-}
+const sq2coord = [
+  'xx',
+  'b8', 'd8', 'f8', 'h8',
+  'a7', 'c7', 'e7', 'g7',
+  'b6', 'd6', 'f6', 'h6',
+  'a5', 'c5', 'e5', 'g5',
+  'b4', 'd4', 'f4', 'h4',
+  'a3', 'c3', 'e3', 'g3',
+  'b2', 'd2', 'f2', 'h2',
+  'a1', 'c1', 'e1', 'g1'
+]
 
+var realdepth = 0;
 
 function printBoard() {
   let boardStr = '';
-  let pieces = ['#', '', '', '', '', 'o', 'x', '', '', 'O', 'X', '',  '', '', '', '', '.'];
-  boardStr += '8  ';  for (let sq = 5; sq < 9; sq++) boardStr +=  '   ' + pieces[board[sq]]; boardStr += '\n';
-  boardStr += '7   '; for (let sq = 10; sq < 14; sq++) boardStr +=  pieces[board[sq]] + '   '; boardStr += '\n';
-  boardStr += '6  ';  for (let sq = 14; sq < 18; sq++) boardStr += '   ' + pieces[board[sq]]; boardStr += '\n';
-  boardStr += '5   '; for (let sq = 19; sq < 23; sq++) boardStr += pieces[board[sq]] + '   '; boardStr += '\n';
-  boardStr += '4  '; for (let sq = 23; sq < 27; sq++) boardStr += '   ' + pieces[board[sq]]; boardStr += '\n';
-  boardStr += '3   '; for (let sq = 28; sq < 32; sq++) boardStr += pieces[board[sq]] + '   '; boardStr += '\n';
-  boardStr += '2  '; for (let sq = 32; sq < 36; sq++) boardStr += '   ' + pieces[board[sq]]; boardStr += '\n';
-  boardStr += '1   '; for (let sq = 37; sq < 41; sq++) boardStr += pieces[board[sq]] + '   '; boardStr += '\n';
-  boardStr += '\n    a b c d e f g h'; console.log(boardStr);
+  let pieces = ['.', '', '', '', '', 'o', 'x', '', '', 'O', 'X'];
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      boardStr += ' ' + pieces[board[7-col][row]];
+    } boardStr += '\n';
+  } console.log(boardStr);
 }
 
-function initBoard() {
-  for(let sq = 0; sq < 46; sq++) board[sq] = OFFBOARD;
-  for(let sq = 5; sq <= 40; sq++) board[sq] = EMPTY;
-  for(let sq = 5; sq <= 40; sq++) if (board[sq] == 0) board[sq] = EMPTY;
-  for(let sq = 9; sq <= 36; sq += 9) board[sq] = OFFBOARD;
+function move2str(move) {
+  let j;
+  let src = move.m[0] % 256;
+  let dst = move.m[1] % 256;
+  src = src-parseInt(src/9);
+  dst = dst-parseInt(dst/9);
+  src -= 5; dst -= 5;
+  j = src%4; src -= j; j = 3-j; src += j;
+  j = dst%4; dst -= j; j = 3-j; dst += j;
+  src++; dst++;
+  let c = '-';
+  if(move.l > 2) c = 'x';
+  return sq2coord[src]+c+sq2coord[dst];
+}
+
+function dsp2brd() {
+  for(let sq = 0; sq < 46; sq++) b[sq] = OFFBOARD;
+  for(let sq = 5; sq <= 40; sq++) b[sq] = EMPTY;
+  b[ 5]=board[0][0];b[ 6]=board[2][0];b[ 7]=board[4][0];b[ 8]=board[6][0];
+  b[10]=board[1][1];b[11]=board[3][1];b[12]=board[5][1];b[13]=board[7][1];
+  b[14]=board[0][2];b[15]=board[2][2];b[16]=board[4][2];b[17]=board[6][2];
+  b[19]=board[1][3];b[20]=board[3][3];b[21]=board[5][3];b[22]=board[7][3];
+  b[23]=board[0][4];b[24]=board[2][4];b[25]=board[4][4];b[26]=board[6][4];
+  b[28]=board[1][5];b[29]=board[3][5];b[30]=board[5][5];b[31]=board[7][5];
+  b[32]=board[0][6];b[33]=board[2][6];b[34]=board[4][6];b[35]=board[6][6];
+  b[37]=board[1][7];b[38]=board[3][7];b[39]=board[5][7];b[40]=board[7][7];
+  for(let sq = 5; sq <= 40; sq++) if (b[sq] == 0) b[sq] = EMPTY;
+  for(let sq = 9; sq <= 36; sq += 9) b[sq] = OFFBOARD;
+}
+
+function brd2dsp() {
+  for( let sq=5; sq <= 40; sq++) if (b[sq] == EMPTY) b[sq]=0;
+  board[0][0]=b[5];board[2][0]=b[6];board[4][0]=b[7];board[6][0]=b[8];
+  board[1][1]=b[10];board[3][1]=b[11];board[5][1]=b[12];board[7][1]=b[13];
+  board[0][2]=b[14];board[2][2]=b[15];board[4][2]=b[16];board[6][2]=b[17];
+  board[1][3]=b[19];board[3][3]=b[20];board[5][3]=b[21];board[7][3]=b[22];
+  board[0][4]=b[23];board[2][4]=b[24];board[4][4]=b[25];board[6][4]=b[26];
+  board[1][5]=b[28];board[3][5]=b[29];board[5][5]=b[30];board[7][5]=b[31];
+  board[0][6]=b[32];board[2][6]=b[33];board[4][6]=b[34];board[6][6]=b[35];
+  board[1][7]=b[37];board[3][7]=b[38];board[5][7]=b[39];board[7][7]=b[40];
 }
 
 function createMove() {
@@ -77,10 +116,9 @@ function generateQuiets(color) {
   let quiets = [];
   if (color == BLACK) {
     for (let sq = 5; sq <= 40; sq++) {
-      if ((board[sq] & BLACK) != 0) {
-        if ((board[sq] & MAN) != 0) {
-          // +4 Move up & left
-          if ((board[sq+4] & EMPTY) != 0) {
+      if ((b[sq] & BLACK) != 0) {
+        if ((b[sq] & MAN) != 0) {
+          if ((b[sq+4] & EMPTY) != 0) {
             let move = createMove(); move.l = 2;
             if (sq > 32) m = (BLACK|KING); else m = (BLACK|MAN);
             m = m << 8;  m += (sq + 4); move.m[1] = m;
@@ -94,28 +132,27 @@ function generateQuiets(color) {
 }
 
 function makeMove(move) {
-  let sq, after;
+  let sq, pce;
   sq = move.m[0] & 255;
-  console.log(sq2coord[sq])
-  
+  b[sq] = EMPTY;
   sq = move.m[1] & 255;
-  
+  pce = (move.m[1] >> 8);
+  b[sq]=pce;
+  for (let i = 2; i < move.l; i++) {
+    sq = (move.m[i] & 255);
+    b[sq] = EMPTY;
+  } realdepth++;
 }
 
-initBoard();
-
-
-board[coord2sq['d4']] = BLACK|MAN
-
-// +5 down left
-
-
-//board[   coord2sq['d4'] - 5   ] = BLACK|MAN
-
-
+dsp2brd();
 printBoard();
-generateQuiets(BLACK);
 
+let quiets = generateQuiets(BLACK);
+for (let quiet of quiets) console.log(move2str(quiet));
+makeMove(quiets[0]);
+
+brd2dsp();
+printBoard();
 
 
 </script>
