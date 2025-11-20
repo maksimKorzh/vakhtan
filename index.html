@@ -32,11 +32,11 @@ var board = [ // white on the right, black on the left
   [0, 6, 0, 0, 0, 5, 0, 5]*/
 
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 6, 0, 0, 0, 0, 0, 0],
-  [0, 0, 6, 0, 0, 0, 6, 0],
-  [0, 0, 0, 0, 0, 6, 0, 0],
-  [0, 0, 0, 0, 6, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 5, 0, 5, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 5, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 5, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
@@ -349,7 +349,7 @@ function blackKingCapture(inputMove, j) {
   if ((b[temp] & WHITE) != 0) {
     capSq = temp;
     temp += 4;
-    while ((b[temp] & FREE) != 0) {
+    while ((b[temp] & FREE) != 0) {console.log('temp', temp)
       if (testFrom13b(temp)) {
         move = structuredClone(orgMove);
         move.l++;
@@ -362,8 +362,7 @@ function blackKingCapture(inputMove, j) {
         tmp = b[capSq]; b[capSq] = OCCUPIED;
         blackKingCapture(inputMove, temp);
         b[capSq] = tmp;
-        temp += 4;
-      }
+      } temp += 4;
       if (!foundPd) {
         temp = capSq;
         temp += 4;
@@ -376,7 +375,7 @@ function blackKingCapture(inputMove, j) {
           foundCap = 1;
           inputMove = structuredClone(move);
           tmp = b[capSq]; b[capSq] = OCCUPIED;
-          black_king_capture(inputMove, temp);
+          blackKingCapture(inputMove, temp);
           b[capSq] = tmp;
           temp += 4;
         }
@@ -385,7 +384,7 @@ function blackKingCapture(inputMove, j) {
   }
   
   
-  
+  return inputMove;  
 }
 
 function makeMove(move) {
@@ -418,11 +417,13 @@ function undoMove(move) {
 dsp2brd();
 printBoard();
 
-let quiets = generateQuiets(WHITE);
-for (let quiet of quiets) console.log(move2str(quiet));
+//let quiets = generateQuiets(WHITE);
+//for (let quiet of quiets) console.log(move2str(quiet));
 
-
-
+let move = createMove();
+move.l=1;
+let bcc = blackKingCapture(move, coord2sq['c7']);
+console.log(bcc);
 
 </script>
 
