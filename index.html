@@ -33,10 +33,10 @@ var board = [ // white on the right, black on the left
 
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 5, 0, 5, 0, 0, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 5, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 5, 0, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
@@ -335,13 +335,13 @@ function testFrom02w(mloc) {
   return 0;
 }
 
-function blackKingCapture(inputMove, j) {
+function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
   let m, temp, tmp, capSq, foundPd;
   let foundCap = 0;
   let move, orgMove;
   orgMove = structuredClone(inputMove);
   
-  // +4  
+  // +4
   temp = j;
   foundPd = 0;
   do temp += 4;
@@ -349,7 +349,7 @@ function blackKingCapture(inputMove, j) {
   if ((b[temp] & WHITE) != 0) {
     capSq = temp;
     temp += 4;
-    while ((b[temp] & FREE) != 0) {console.log('temp', temp)
+    while ((b[temp] & FREE) != 0) {
       if (testFrom13b(temp)) {
         move = structuredClone(orgMove);
         move.l++;
@@ -383,6 +383,48 @@ function blackKingCapture(inputMove, j) {
     }
   }
   
+  
+  // +5
+  temp = j;
+  foundPd = 0;
+  do temp += 5;
+  while((b[temp] & FREE) != 0);
+  if ((b[temp] & WHITE) != 0) {
+    capSq = temp;
+    temp += 5;
+    while ((b[temp] & FREE) != 0) {
+      if (testFrom02b(temp)) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundPd = 1;
+        foundCap = 1;
+        inputMove = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(inputMove, temp);
+        b[capSq] = tmp;
+      } temp += 5;
+      if (!foundPd) { console.log('+5')
+        temp = capSq;
+        temp += 5;
+        while((b[temp] & FREE) != 0) {
+          move = structuredClone(orgMove);
+          move.l++;
+          move.path[move.l-2] = temp;
+          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+          foundCap = 1;
+          inputMove = structuredClone(move);
+          tmp = b[capSq]; b[capSq] = OCCUPIED;
+          blackKingCapture(inputMove, temp);
+          b[capSq] = tmp;
+          temp += 5;
+        }
+      }
+    }
+  }
   
   return inputMove;  
 }
@@ -421,8 +463,8 @@ printBoard();
 //for (let quiet of quiets) console.log(move2str(quiet));
 
 let move = createMove();
-move.l=1;
-let bcc = blackKingCapture(move, coord2sq['c7']);
+//move.l=1;
+let bcc = blackKingCapture(move, coord2sq['a7']);
 console.log(bcc);
 
 </script>
