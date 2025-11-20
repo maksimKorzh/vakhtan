@@ -1,10 +1,10 @@
 <script>
-const OFFBOARD = 0
+const OCCUPIED = 0
 const WHITE = 1
 const BLACK = 2
 const MAN = 4
 const KING = 8
-const EMPTY = 16
+const FREE = 16
 const CHANGECOLOR = 3
 
 // 5s go from right to left
@@ -93,7 +93,7 @@ function printBoard() {
 function clearDisplay() {
   for (let row = 0; row < 8; row++)
     for (let col = 0; col < 8; col++)
-      board[row][col] = EMPTY;
+      board[row][col] = FREE;
 }
 
 function move2str(move) {
@@ -112,8 +112,8 @@ function move2str(move) {
 }
 
 function dsp2brd() {
-  for(let sq = 0; sq < 46; sq++) b[sq] = OFFBOARD;
-  for(let sq = 5; sq <= 40; sq++) b[sq] = EMPTY;
+  for(let sq = 0; sq < 46; sq++) b[sq] = OCCUPIED;
+  for(let sq = 5; sq <= 40; sq++) b[sq] = FREE;
   b[ 5]=board[0][0];b[ 6]=board[2][0];b[ 7]=board[4][0];b[ 8]=board[6][0];
   b[10]=board[1][1];b[11]=board[3][1];b[12]=board[5][1];b[13]=board[7][1];
   b[14]=board[0][2];b[15]=board[2][2];b[16]=board[4][2];b[17]=board[6][2];
@@ -122,8 +122,8 @@ function dsp2brd() {
   b[28]=board[1][5];b[29]=board[3][5];b[30]=board[5][5];b[31]=board[7][5];
   b[32]=board[0][6];b[33]=board[2][6];b[34]=board[4][6];b[35]=board[6][6];
   b[37]=board[1][7];b[38]=board[3][7];b[39]=board[5][7];b[40]=board[7][7];
-  for(let sq = 5; sq <= 40; sq++) if (b[sq] == 0) b[sq] = EMPTY;
-  for(let sq = 9; sq <= 36; sq += 9) b[sq] = OFFBOARD;
+  for(let sq = 5; sq <= 40; sq++) if (b[sq] == 0) b[sq] = FREE;
+  for(let sq = 9; sq <= 36; sq += 9) b[sq] = OCCUPIED;
 }
 
 function brd2dsp() {
@@ -149,14 +149,14 @@ function generateQuiets(color) {
     for (let sq = 5; sq <= 40; sq++) {
       if ((b[sq] & BLACK) != 0) {
         if ((b[sq] & MAN) != 0) {
-          if ((b[sq+4] & EMPTY) != 0) {
+          if ((b[sq+4] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
             m = m << 8;  m += (sq+4); move.m[1] = m;
             m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
             quiets.push(move)
           }
-          if ((b[sq+5] & EMPTY) != 0) {
+          if ((b[sq+5] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
             m = m << 8;  m += (sq+5); move.m[1] = m;
@@ -167,7 +167,7 @@ function generateQuiets(color) {
         if ((b[sq] & KING) != 0) {
           temp = sq;
           temp += 4;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -176,7 +176,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp += 5;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -185,7 +185,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp -= 4;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -194,7 +194,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp -= 5;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -209,14 +209,14 @@ function generateQuiets(color) {
     for (let sq = 5; sq <= 40; sq++) {
       if ((b[sq] & WHITE) != 0) {
         if ((b[sq] & MAN) != 0) {
-          if ((b[sq-4] & EMPTY) != 0) {
+          if ((b[sq-4] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
             m = m << 8;  m += (sq-4); move.m[1] = m;
             m = (WHITE|MAN); m = m << 8; m += sq; move.m[0] = m;
             quiets.push(move)
           }
-          if ((b[sq-5] & EMPTY) != 0) {
+          if ((b[sq-5] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
             m = m << 8;  m += (sq-5); move.m[1] = m;
@@ -227,7 +227,7 @@ function generateQuiets(color) {
         if ((b[sq] & KING) != 0) {
           temp = sq;
           temp += 4;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -236,7 +236,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp += 5;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -245,7 +245,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp -= 4;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -254,7 +254,7 @@ function generateQuiets(color) {
           }
           temp = sq;
           temp -= 5;
-          while((b[temp] & EMPTY) != 0) {
+          while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
             m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
@@ -271,15 +271,15 @@ function testFrom13b(mloc) {
   let sq;
   sq = mloc;
   do sq += 5;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & WHITE) != 0)
-    if ((b[sq+5] & EMPTY) != 0)
+    if ((b[sq+5] & FREE) != 0)
       return 1;
   sq = mloc;
   do sq -= 5;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & WHITE) != 0)
-    if ((b[sq-5] & EMPTY) != 0)
+    if ((b[sq-5] & FREE) != 0)
       return 1;
   return 0;
 }
@@ -288,15 +288,15 @@ function testFrom02b(mloc) {
   let sq;
   sq = mloc;
   do sq += 4;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & WHITE) != 0)
-    if ((b[sq+4] & EMPTY) != 0)
+    if ((b[sq+4] & FREE) != 0)
       return 1;
   sq = mloc;
   do sq -= 4;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & WHITE) != 0)
-    if ((b[sq-4] & EMPTY) != 0)
+    if ((b[sq-4] & FREE) != 0)
       return 1;
   return 0;
 }
@@ -305,15 +305,15 @@ function testFrom13w(mloc) {
   let sq;
   sq = mloc;
   do sq += 5;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & BLACK) != 0)
-    if ((b[sq+5] & EMPTY) != 0)
+    if ((b[sq+5] & FREE) != 0)
       return 1;
   sq = mloc;
   do sq -= 5;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & BLACK) != 0)
-    if ((b[sq-5] & EMPTY) != 0)
+    if ((b[sq-5] & FREE) != 0)
       return 1;
   return 0;
 }
@@ -322,36 +322,89 @@ function testFrom02w(mloc) {
   let sq;
   sq = mloc;
   do sq += 4;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & BLACK) != 0)
-    if ((b[sq+4] & EMPTY) != 0)
+    if ((b[sq+4] & FREE) != 0)
       return 1;
   sq = mloc;
   do sq -= 4;
-  while((b[sq] & EMPTY) != 0);
+  while((b[sq] & FREE) != 0);
   if ((b[sq] & BLACK) != 0)
-    if ((b[sq-4] & EMPTY) != 0)
+    if ((b[sq-4] & FREE) != 0)
       return 1;
   return 0;
+}
+
+function blackKingCapture(inputMove, j) {
+  let m, temp, tmp, capSq, foundPd;
+  let foundCap = 0;
+  let move, orgMove;
+  orgMove = structuredClone(inputMove);
+  
+  // +4  
+  temp = j;
+  foundPd = 0;
+  do temp += 4;
+  while((b[temp] & FREE) != 0);
+  if ((b[temp] & WHITE) != 0) {
+    capSq = temp;
+    temp += 4;
+    while ((b[temp] & FREE) != 0) {
+      if (testFrom13b(temp)) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundPd = 1;
+        foundCap = 1;
+        inputMove = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(inputMove, temp);
+        b[capSq] = tmp;
+        temp += 4;
+      }
+      if (!foundPd) {
+        temp = capSq;
+        temp += 4;
+        while((b[temp] & FREE) != 0) {
+          move = structuredClone(orgMove);
+          move.l++;
+          move.path[move.l-2] = temp;
+          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+          foundCap = 1;
+          inputMove = structuredClone(move);
+          tmp = b[capSq]; b[capSq] = OCCUPIED;
+          black_king_capture(inputMove, temp);
+          b[capSq] = tmp;
+          temp += 4;
+        }
+      }
+    }
+  }
+  
+  
+  
 }
 
 function makeMove(move) {
   let sq, after;
   sq = move.m[0] & 255;
-  b[sq] = EMPTY;
+  b[sq] = FREE;
   sq = move.m[1] & 255;
   after = (move.m[1] >> 8);
   b[sq]=after;
   for (let i = 2; i < move.l; i++) {
     sq = (move.m[i] & 255);
-    b[sq] = EMPTY;
+    b[sq] = FREE;
   } ply++;
 }
 
 function undoMove(move) {
   let sq, before;
   sq = move.m[1] & 255;
-  b[sq] = EMPTY;
+  b[sq] = FREE;
   sq = move.m[0] & 255;
   before = (move.m[0] >> 8);
   b[sq] = before;
