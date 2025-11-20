@@ -33,11 +33,11 @@ var board = [ // white on the right, black on the left
   [0, 6, 0, 0, 0, 5, 0, 5]*/
 
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 6, 0, 0, 0, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
@@ -288,6 +288,55 @@ function generateCaptures(moveList, color) {
                 blackManCapture(n, moveList, sq+8);
                 b[sq+4] = tmp;
               }
+            }
+          }
+          
+          // +5
+          if ((b[sq+5] & WHITE) != 0) {
+            if (b[sq+10] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq+10);
+              m = (BLACK|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq+5]; m = m << 8; m += (sq+5); moveList[n[0]].m[2] = m;
+              if (sq >= 28) {
+                m = (BLACK|KING); m = m << 8; m += (sq+10); moveList[n[0]].m[1] = m;
+                tmp = b[sq+5]; b[sq+5] = OCCUPIED;
+                blackKingCapture(n, moveList, sq+10);
+                b[sq+5] = tmp;
+              } else {
+                m = (BLACK|MAN); m = m << 8; m += (sq+10); moveList[n[0]].m[1] = m;
+                tmp = b[sq+5]; b[sq+5] = OCCUPIED;
+                blackManCapture(n, moveList, sq+10);
+                b[sq+5] = tmp;
+              }
+            }
+          }
+          
+          // -4
+          if ((b[sq-4] & WHITE) != 0) {
+            if (b[sq-8] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq-8);
+              m = (BLACK|MAN); m = m << 8; m += (sq-8); moveList[n[0]].m[1] = m;
+              m = (BLACK|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq-4]; m = m << 8; m += (sq-4); moveList[n[0]].m[2] = m;
+              tmp = b[sq-4]; b[sq-4] = OCCUPIED;
+              blackManCapture(n, moveList, sq-8);
+              b[sq-4] = tmp;
+            }
+          }
+          
+          // -5
+          if ((b[sq-5] & WHITE) != 0) {
+            if (b[sq-10] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq-10);
+              m = (BLACK|MAN); m = m << 8; m += (sq-10); moveList[n[0]].m[1] = m;
+              m = (BLACK|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq-5]; m = m << 8; m += (sq-5); moveList[n[0]].m[2] = m;
+              tmp = b[sq-5]; b[sq-5] = OCCUPIED;
+              blackManCapture(n, moveList, sq-10);
+              b[sq-5] = tmp;
             }
           }
           
