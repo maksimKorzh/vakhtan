@@ -1111,7 +1111,7 @@ function whiteManCapture(n, moveList, j) {
       foundCap = 1;
       moveList[n[0]] = structuredClone(move);
       tmp = b[j+5]; b[j+5] = OCCUPIED;
-      whiteManCapture(n, moveList, j-10);
+      whiteManCapture(n, moveList, j+10);
       b[j+5] = tmp;
     }
   }
@@ -1135,7 +1135,7 @@ function whiteManCapture(n, moveList, j) {
         foundCap = 1;
         moveList[n[0]] = structuredClone(move);
         tmp = b[j-4]; b[j-4] = OCCUPIED;
-        blackManCapture(n, moveList, j-8);
+        whiteManCapture(n, moveList, j-8);
         b[j-4] = tmp;
       }
     }
