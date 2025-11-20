@@ -34,11 +34,11 @@ var board = [ // white on the right, black on the left
 
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 5, 0, 0, 0],
   [0, 6, 0, 6, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 6, 0, 6, 0, 0, 0, 0],
-  [5, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
@@ -1372,15 +1372,15 @@ function undoMove(move) {
 dsp2brd();
 printBoard();
 
-//let moveList = createMoveList();
-//let n = generateQuiets(moveList, WHITE);
-//printMoveList(moveList, n);
 
 let moveList = createMoveList();
-//blackKingCapture(n, moveList, coord2sq['a7']);
 let n = generateCaptures(moveList, WHITE);
 printMoveList(moveList, n);
-console.log(moveList);
+makeMove(moveList[0]);
+printBoard();
+undoMove(moveList[0]);
+printBoard();
+//console.log(moveList);
 
 </script>
 
