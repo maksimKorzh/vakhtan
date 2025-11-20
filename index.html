@@ -35,8 +35,8 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 9, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 9, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
@@ -52,6 +52,17 @@ const sq2coord = [
   'b2', 'd2', 'f2', 'h2',
   'a1', 'c1', 'e1', 'g1'
 ];
+
+const coord2sq = {
+  'h8':  5, 'f8':  6, 'd8':  7, 'b8': 8,
+  'g7': 10, 'e7': 11, 'c7': 12, 'a7': 13,
+  'h6': 14, 'f6': 15, 'd6': 16, 'b6': 17,
+  'g5': 19, 'e5': 20, 'c5': 21, 'a5': 22,
+  'h4': 23, 'f4': 24, 'd4': 25, 'b4': 26,
+  'g3': 28, 'e3': 29, 'c3': 30, 'a3': 31,
+  'h2': 32, 'f2': 33, 'd2': 34, 'b2': 35,
+  'g1': 37, 'e1': 38, 'c1': 39, 'a1': 40
+}
 
 var realdepth = 0;
 
@@ -236,6 +247,23 @@ function generateQuiets(color) {
       }
     }
   } return quiets;
+}
+
+function testFrom13b(mloc) {
+  let sq;
+  sq = mloc;
+  do sq += 5
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & WHITE) != 0)
+    if ((b[sq+5] & EMPTY) != 0)
+      return 1;
+  sq = mloc;
+  do sq -= 5
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & WHITE) != 0)
+    if ((b[sq-5] & EMPTY) != 0)
+      return 1;
+  return 0;
 }
 
 function makeMove(move) {
