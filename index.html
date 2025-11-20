@@ -34,11 +34,11 @@ var board = [ // white on the right, black on the left
 
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
-  [0, 0, 0, 0, 0, 0, 0, 6],
+  [0, 6, 0, 6, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 6, 0, 6, 0, 0, 0, 0],
+  [5, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
@@ -511,7 +511,7 @@ function generateCaptures(moveList, color) {
           b[sq] = FREE;
           
           // +4
-          if ((b[sq+4] & WHITE) != 0) {
+          if ((b[sq+4] & BLACK) != 0) {
             if (b[sq+8] & FREE ) {
               moveList[n[0]].l = 3;
               moveList[n[0]].path[1] = (sq+8);
@@ -525,7 +525,7 @@ function generateCaptures(moveList, color) {
           }
           
           // +5
-          if ((b[sq+5] & WHITE) != 0) {
+          if ((b[sq+5] & BLACK) != 0) {console.log('back')
             if (b[sq+10] & FREE ) {
               moveList[n[0]].l = 3;
               moveList[n[0]].path[1] = (sq+10);
@@ -560,7 +560,7 @@ function generateCaptures(moveList, color) {
           }
           
           // -5
-          if ((b[sq-5] & WHITE) != 0) {
+          if ((b[sq-5] & BLACK) != 0) {
             if (b[sq-10] & FREE ) {
               moveList[n[0]].l = 3;
               moveList[n[0]].path[1] = (sq-10);
@@ -1378,7 +1378,7 @@ printBoard();
 
 let moveList = createMoveList();
 //blackKingCapture(n, moveList, coord2sq['a7']);
-let n = generateCaptures(moveList, BLACK);
+let n = generateCaptures(moveList, WHITE);
 printMoveList(moveList, n);
 console.log(moveList);
 
