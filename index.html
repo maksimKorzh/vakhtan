@@ -299,7 +299,7 @@ function generateCaptures(moveList, color) {
               temp += 4;
               while((b[temp] & FREE) != 0) {
                 moveList[n[0]].l = 3;
-                movelist[n[0]].path[1] = temp;
+                moveList[n[0]].path[1] = temp;
                 m = (BLACK|KING); m = m << 8; m += temp; moveList[n[0]].m[1] = m;
                 m = (BLACK|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
@@ -337,7 +337,7 @@ function generateCaptures(moveList, color) {
               temp += 5;
               while((b[temp] & FREE) != 0) {
                 moveList[n[0]].l = 3;
-                movelist[n[0]].path[1] = temp;
+                moveList[n[0]].path[1] = temp;
                 m = (BLACK|KING); m = m << 8; m += temp; moveList[n[0]].m[1] = m;
                 m = (BLACK|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
@@ -375,7 +375,7 @@ function generateCaptures(moveList, color) {
               temp -= 4;
               while((b[temp] & FREE) != 0) {
                 moveList[n[0]].l = 3;
-                movelist[n[0]].path[1] = temp;
+                moveList[n[0]].path[1] = temp;
                 m = (BLACK|KING); m = m << 8; m += temp; moveList[n[0]].m[1] = m;
                 m = (BLACK|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
@@ -413,7 +413,7 @@ function generateCaptures(moveList, color) {
               temp -= 5;
               while((b[temp] & FREE) != 0) {
                 moveList[n[0]].l = 3;
-                movelist[n[0]].path[1] = temp;
+                moveList[n[0]].path[1] = temp;
                 m = (BLACK|KING); m = m << 8; m += temp; moveList[n[0]].m[1] = m;
                 m = (BLACK|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
@@ -449,7 +449,7 @@ function generateCaptures(moveList, color) {
             capSq = temp;
             temp += 4;
             while((b[temp] & FREE) != 0) {
-              if (testFrom13b(temp)) {
+              if (testFrom13w(temp)) {
                 foundPd = 1;
                 moveList[n[0]].l = 3;
                 moveList[n[0]].path[1] = temp;
@@ -457,7 +457,7 @@ function generateCaptures(moveList, color) {
                 m = (WHITE|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
                 tmp = b[capSq]; b[capSq] = OCCUPIED;
-                //whiteKingCapture(n, moveList, temp);
+                whiteKingCapture(n, moveList, temp);
                 b[capSq] = tmp;
               } temp += 4;
             }
@@ -466,7 +466,7 @@ function generateCaptures(moveList, color) {
               temp += 4;
               while((b[temp] & FREE) != 0) {
                 moveList[n[0]].l = 3;
-                movelist[n[0]].path[1] = temp;
+                moveList[n[0]].path[1] = temp;
                 m = (WHITE|KING); m = m << 8; m += temp; moveList[n[0]].m[1] = m;
                 m = (WHITE|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
@@ -941,7 +941,7 @@ printBoard();
 
 let moveList = createMoveList();
 //blackKingCapture(n, moveList, coord2sq['a7']);
-let n = generateCaptures(moveList, BLACK);
+let n = generateCaptures(moveList, WHITE);
 printMoveList(moveList, n);
 console.log(moveList);
 
