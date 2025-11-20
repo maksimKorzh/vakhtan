@@ -35,9 +35,9 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 5, 0, 5, 0],
-  [0, 0, 0, 6, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
+  [0, 0, 0, 6, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
@@ -285,7 +285,7 @@ function generateCaptures(moveList, color) {
               } else {
                 m = (BLACK|MAN); m = m << 8; m += (sq+8); moveList[n[0]].m[1] = m;
                 tmp = b[sq+4]; b[sq+4] = OCCUPIED;
-                //blackManCapture(n, moveList, sq+8);
+                blackManCapture(n, moveList, sq+8);
                 b[sq+4] = tmp;
               }
             }
@@ -691,6 +691,95 @@ function testFrom02w(mloc) {
   return 0;
 }
 
+function blackManCapture(n, moveList, j) {
+  let m, temp, tmp;
+  let foundCap = 0;
+  let move, orgMove;
+  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
+
+  // +4
+  if ((b[j+4] & WHITE) != 0) {
+    if (b[j+8] & FREE ) {
+      move = structuredClone(orgMove);
+      move.l++;
+      move.path[move.l-2] = (j+8);
+      m = b[j+4]; m = m << 8; m += (j+4); move.m[move.l-1] = m;
+      if (j >= 28) {
+        m = (BLACK|KING); m = m << 8; m += (j+8); move.m[1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[j+4]; b[j+4] = OCCUPIED;
+        blackKingCapture(n, moveList, j+8);
+        b[j+4] = tmp;
+      } else {
+        m = (BLACK|MAN); m = m << 8; m += (j+8); move.m[1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[j+4]; b[j+4] = OCCUPIED;
+        blackManCapture(n, moveList, j+8);
+        b[j+4] = tmp;
+      }
+    }
+  }
+  
+  // +5
+  if ((b[j+5] & WHITE) != 0) {
+    if (b[j+10] & FREE ) {
+      move = structuredClone(orgMove);
+      move.l++;
+      move.path[move.l-2] = (j+10);
+      m = b[j+5]; m = m << 8; m += (j+5); move.m[move.l-1] = m;
+      if (j >= 28) {
+        m = (BLACK|KING); m = m << 8; m += (j+10); move.m[1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[j+5]; b[j+5] = OCCUPIED;
+        blackKingCapture(n, moveList, j+10);
+        b[j+5] = tmp;
+      } else {
+        m = (BLACK|MAN); m = m << 8; m += (j+10); move.m[1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[j+5]; b[j+5] = OCCUPIED;
+        blackManCapture(n, moveList, j+10);
+        b[j+5] = tmp;
+      }
+    }
+  }
+  
+  // -4
+  if ((b[j-4] & WHITE) != 0) {
+    if (b[j-8] & FREE ) {
+      move = structuredClone(orgMove);
+      move.l++;
+      move.path[move.l-2] = (j-8);
+      m = (BLACK|MAN); m = m << 8; m += (j-8); move.m[1] = m;
+      m = b[j-4]; m = m << 8; m += (j-4); move.m[move.l-1] = m;
+      foundCap = 1;
+      moveList[n[0]] = structuredClone(move);
+      tmp = b[j-4]; b[j-4] = OCCUPIED;
+      blackManCapture(n, moveList, j-8);
+      b[j-4] = tmp;
+    }
+  }
+  
+  // +5
+  if ((b[j-5] & WHITE) != 0) {
+    if (b[j-10] & FREE ) {
+      move = structuredClone(orgMove);
+      move.l++;
+      move.path[move.l-2] = (j-10);
+      m = (BLACK|MAN); m = m << 8; m += (j-10); move.m[1] = m;
+      m = b[j-5]; m = m << 8; m += (j-5); move.m[move.l-1] = m;
+      foundCap = 1;
+      moveList[n[0]] = structuredClone(move);
+      tmp = b[j-5]; b[j-5] = OCCUPIED;
+      blackManCapture(n, moveList, j-10);
+      b[j-5] = tmp;
+    }
+  } if (!foundCap) n[0]++;
+}
+
 function blackKingCapture(n, moveList, j) {
   let m, temp, tmp, capSq, foundPd;
   let foundCap = 0;
@@ -1077,7 +1166,7 @@ printBoard();
 
 let moveList = createMoveList();
 //blackKingCapture(n, moveList, coord2sq['a7']);
-let n = generateCaptures(moveList, WHITE);
+let n = generateCaptures(moveList, BLACK);
 printMoveList(moveList, n);
 console.log(moveList);
 
