@@ -6,6 +6,7 @@ const MAN = 4
 const KING = 8
 const FREE = 16
 const CHANGECOLOR = 3
+const MAXMOVES = 50;
 
 // 5s go from right to left
 // 6s go from left to right
@@ -139,12 +140,17 @@ function brd2dsp() {
 }
 
 function createMove() {
-  return {l: 0, m: new Array(10), path: new Array(10)};
+  return {l: 0, m: new Array(10).fill(0), path: new Array(10).fill(0)};
 }
 
-function generateQuiets(color) {
-  let m = 0, temp = 0;
-  let quiets = [];
+function createMoveList() {
+  let moveList = [];
+  for (let i = 0; i < MAXMOVES; i++) moveList.push(createMove());
+  return moveList;
+}
+
+function generateQuiets(moveList, color) {
+  let m = 0, temp = 0; n = 0;
   if (color == BLACK) {
     for (let sq = 5; sq <= 40; sq++) {
       if ((b[sq] & BLACK) != 0) {
@@ -152,54 +158,46 @@ function generateQuiets(color) {
           if ((b[sq+4] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
-            m = m << 8;  m += (sq+4); move.m[1] = m;
-            m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move)
+            m = m << 8;  m += (sq+4); moveList[n].m[1] = m;
+            m = (BLACK|MAN); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++;
           }
           if ((b[sq+5] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
-            m = m << 8;  m += (sq+5); move.m[1] = m;
-            m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
+            m = m << 8;  m += (sq+5); moveList[n].m[1] = m;
+            m = (BLACK|MAN); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++;
           }
         }
         if ((b[sq] & KING) != 0) {
-          temp = sq;
-          temp += 4;
+          temp = sq; temp += 4;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp += 4;
+            m = (BLACK|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (BLACK|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp += 4;
           }
-          temp = sq;
-          temp += 5;
+          temp = sq; temp += 5;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp += 5;
+            m = (BLACK|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (BLACK|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp += 5;
           }
-          temp = sq;
-          temp -= 4;
+          temp = sq; temp -= 4;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp -= 4;
+            m = (BLACK|KING); m = m << 8; m += temp; moveList.m[1] = m;
+            m = (BLACK|KING); m = m << 8; m += sq; moveList.m[0] = m;
+            n++; temp -= 4;
           }
-          temp = sq;
-          temp -= 5;
+          temp = sq; temp -= 5;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (BLACK|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp -= 5;
+            m = (BLACK|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (BLACK|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp -= 5;
           }
         }
       }
@@ -212,54 +210,46 @@ function generateQuiets(color) {
           if ((b[sq-4] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
-            m = m << 8;  m += (sq-4); move.m[1] = m;
-            m = (WHITE|MAN); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move)
+            m = m << 8;  m += (sq-4); moveList[n].m[1] = m;
+            m = (WHITE|MAN); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++;
           }
           if ((b[sq-5] & FREE) != 0) {
             let move = createMove(); move.l = 2;
             if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
-            m = m << 8;  m += (sq-5); move.m[1] = m;
-            m = (WHITE|MAN); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move)
+            m = m << 8;  m += (sq-5); moveList[n].m[1] = m;
+            m = (WHITE|MAN); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++;
           }
         }
         if ((b[sq] & KING) != 0) {
-          temp = sq;
-          temp += 4;
+          temp = sq; temp += 4;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp += 4;
+            m = (WHITE|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp += 4;
           }
-          temp = sq;
-          temp += 5;
+          temp = sq; temp += 5;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp += 5;
+            m = (WHITE|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp += 5;
           }
-          temp = sq;
-          temp -= 4;
+          temp = sq; temp -= 4;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp -= 4;
+            m = (WHITE|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp -= 4;
           }
-          temp = sq;
-          temp -= 5;
+          temp = sq; temp -= 5;
           while((b[temp] & FREE) != 0) {
             let move = createMove(); move.l = 2;
-            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
-            quiets.push(move);
-            temp -= 5;
+            m = (WHITE|KING); m = m << 8; m += temp; moveList[n].m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; moveList[n].m[0] = m;
+            n++; temp -= 5;
           }
         }
       }
