@@ -35,7 +35,7 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0,10, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 9, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
@@ -60,9 +60,11 @@ function printBoard() {
   let pieces = ['.', '', '', '', '', 'o', 'x', '', '', 'O', 'X'];
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
+      if (col == 0) boardStr += (8-row)
       boardStr += ' ' + pieces[board[7-col][row]];
     } boardStr += '\n';
-  } console.log(boardStr);
+  } boardStr += '  a b c d e f g h';
+  console.log(boardStr);
 }
 
 function move2str(move) {
@@ -121,14 +123,14 @@ function generateQuiets(color) {
           if ((b[sq+4] & EMPTY) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
-            m = m << 8;  m += (sq + 4); move.m[1] = m;
+            m = m << 8;  m += (sq+4); move.m[1] = m;
             m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
             quiets.push(move)
           }
           if ((b[sq+5] & EMPTY) != 0) {
             let move = createMove(); move.l = 2;
             if (sq >= 32) m = (BLACK|KING); else m = (BLACK|MAN);
-            m = m << 8;  m += (sq + 5); move.m[1] = m;
+            m = m << 8;  m += (sq+5); move.m[1] = m;
             m = (BLACK|MAN); m = m << 8; m += sq; move.m[0] = m;
             quiets.push(move);
           }
@@ -173,6 +175,66 @@ function generateQuiets(color) {
         }
       }
     }
+  }
+  if (color == WHITE) {
+    for (let sq = 5; sq <= 40; sq++) {
+      if ((b[sq] & WHITE) != 0) {
+        if ((b[sq] & MAN) != 0) {
+          if ((b[sq-4] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
+            m = m << 8;  m += (sq-4); move.m[1] = m;
+            m = (WHITE|MAN); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move)
+          }
+          if ((b[sq-5] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            if (sq <= 13) m = (WHITE|KING); else m = (WHITE|MAN);
+            m = m << 8;  m += (sq-5); move.m[1] = m;
+            m = (WHITE|MAN); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move)
+          }
+        }
+        if ((b[sq] & KING) != 0) {
+          temp = sq;
+          temp += 4;
+          while((b[temp] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move);
+            temp += 4;
+          }
+          temp = sq;
+          temp += 5;
+          while((b[temp] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move);
+            temp += 5;
+          }
+          temp = sq;
+          temp -= 4;
+          while((b[temp] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move);
+            temp -= 4;
+          }
+          temp = sq;
+          temp -= 5;
+          while((b[temp] & EMPTY) != 0) {
+            let move = createMove(); move.l = 2;
+            m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+            m = (WHITE|KING); m = m << 8; m += sq; move.m[0] = m;
+            quiets.push(move);
+            temp -= 5;
+          }
+        }
+      }
+    }
   } return quiets;
 }
 
@@ -192,7 +254,7 @@ function makeMove(move) {
 dsp2brd();
 printBoard();
 
-let quiets = generateQuiets(BLACK);
+let quiets = generateQuiets(WHITE);
 for (let quiet of quiets) console.log(move2str(quiet));
 makeMove(quiets[0]);
 
