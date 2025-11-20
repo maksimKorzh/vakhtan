@@ -35,7 +35,7 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 0, 0],
+  [0, 0, 0, 0, 9, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
@@ -78,8 +78,9 @@ const sq2coord = {
 var realdepth = 0;
 
 function printBoard() {
+  brd2dsp();
   let boardStr = '';
-  let pieces = ['.', '', '', '', '', 'o', 'x', '', '', 'O', 'X'];
+  let pieces = { 5: 'o', 6: 'x', 9: 'O', 10: 'X', 16: '.'};
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       if (col == 0) boardStr += (8-row)
@@ -87,6 +88,12 @@ function printBoard() {
     } boardStr += '\n';
   } boardStr += '  a b c d e f g h';
   console.log(boardStr);
+}
+
+function clearDisplay() {
+  for (let row = 0; row < 8; row++)
+    for (let col = 0; col < 8; col++)
+      board[row][col] = EMPTY;
 }
 
 function move2str(move) {
@@ -120,7 +127,7 @@ function dsp2brd() {
 }
 
 function brd2dsp() {
-  for( let sq=5; sq <= 40; sq++) if (b[sq] == EMPTY) b[sq]=0;
+  clearDisplay();
   board[0][0]=b[5];board[2][0]=b[6];board[4][0]=b[7];board[6][0]=b[8];
   board[1][1]=b[10];board[3][1]=b[11];board[5][1]=b[12];board[7][1]=b[13];
   board[0][2]=b[14];board[2][2]=b[15];board[4][2]=b[16];board[6][2]=b[17];
@@ -260,16 +267,16 @@ function generateQuiets(color) {
   } return quiets;
 }
 
-function testFrom13b(mloc) {
+function testFrom13b(mloc) { console.log('13b', sq2coord[mloc]);
   let sq;
   sq = mloc;
-  do { sq += 5; console.log(sq)}
+  do { sq += 5; console.log('slide+5', sq, sq2coord[sq], b[sq]&EMPTY)}
   while((b[sq] & EMPTY) != 0);
   if ((b[sq] & WHITE) != 0)
     if ((b[sq+5] & EMPTY) != 0)
       return 1;
   sq = mloc;
-  do { sq -= 5 }
+  do { sq -= 5; console.log('slide-5', sq, sq2coord[sq]) }
   while((b[sq] & EMPTY) != 0);
   if ((b[sq] & WHITE) != 0)
     if ((b[sq-5] & EMPTY) != 0)
@@ -297,7 +304,6 @@ let quiets = generateQuiets(WHITE);
 for (let quiet of quiets) console.log(move2str(quiet));
 //makeMove(quiets[0]);
 
-brd2dsp();
 printBoard();
 
 
