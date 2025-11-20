@@ -1085,7 +1085,7 @@ function whiteManCapture(n, moveList, j) {
   orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
 
   // +4
-  if ((b[j+4] & WHITE) != 0) {
+  if ((b[j+4] & BLACK) != 0) {
     if (b[j+8] & FREE ) {
       move = structuredClone(orgMove);
       move.l++;
@@ -1101,7 +1101,7 @@ function whiteManCapture(n, moveList, j) {
   }
   
   // +5
-  if ((b[j+5] & WHITE) != 0) {
+  if ((b[j+5] & BLACK) != 0) {
     if (b[j+10] & FREE ) {
       move = structuredClone(orgMove);
       move.l++;
@@ -1142,7 +1142,7 @@ function whiteManCapture(n, moveList, j) {
   }
   
   // -5
-  if ((b[j-5] & WHITE) != 0) {
+  if ((b[j-5] & BLACK) != 0) {
     if (b[j-10] & FREE ) {
       move = structuredClone(orgMove);
       move.l++;
