@@ -75,7 +75,7 @@ const sq2coord = {
   37: 'g1', 38: 'e1', 39: 'c1', 40: 'a1'
 }
 
-var realdepth = 0;
+var ply = 0;
 
 function printBoard() {
   brd2dsp();
@@ -302,16 +302,30 @@ function testFrom02b(mloc) {
 }
 
 function makeMove(move) {
-  let sq, pce;
+  let sq, after;
   sq = move.m[0] & 255;
   b[sq] = EMPTY;
   sq = move.m[1] & 255;
-  pce = (move.m[1] >> 8);
-  b[sq]=pce;
+  after = (move.m[1] >> 8);
+  b[sq]=after;
   for (let i = 2; i < move.l; i++) {
     sq = (move.m[i] & 255);
     b[sq] = EMPTY;
-  } realdepth++;
+  } ply++;
+}
+
+function undoMove(move) {
+  let sq, before;
+  sq = move.m[1] & 255;
+  b[sq] = EMPTY;
+  sq = move.m[0] & 255;
+  before = (move.m[0] >> 8);
+  b[sq] = before;
+  for (let i = 2; i < move.l; i++) {
+    sq = (move.m[i] & 255);
+    before = (move.m[i] >> 8);
+    b[sq] = before;
+  } ply--;
 }
 
 dsp2brd();
@@ -319,9 +333,8 @@ printBoard();
 
 let quiets = generateQuiets(WHITE);
 for (let quiet of quiets) console.log(move2str(quiet));
-//makeMove(quiets[0]);
 
-printBoard();
+
 
 
 </script>
