@@ -508,8 +508,81 @@ function generateCaptures(moveList, color) {
     for (sq = 5; sq <= 40; sq++) {
       if ((b[sq] & WHITE) != 0) {
         if ((b[sq] & MAN) != 0) {
-        
+          b[sq] = FREE;
+          
+          // +4
+          if ((b[sq+4] & WHITE) != 0) {
+            if (b[sq+8] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq+8);
+              m = (WHITE|MAN); m = m << 8; m += (sq+8); moveList[n[0]].m[1] = m;
+              m = (WHITE|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq+4]; m = m << 8; m += (sq+4); moveList[n[0]].m[2] = m;
+              tmp = b[sq+4]; b[sq+4] = OCCUPIED;
+              whiteManCapture(n, moveList, sq+8);
+              b[sq+4] = tmp;
+            }
+          }
+          
+          // +5
+          if ((b[sq+5] & WHITE) != 0) {
+            if (b[sq+10] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq+10);
+              m = (WHITE|MAN); m = m << 8; m += (sq+10); moveList[n[0]].m[1] = m;
+              m = (WHITE|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq+5]; m = m << 8; m += (sq+5); moveList[n[0]].m[2] = m;
+              tmp = b[sq+5]; b[sq+5] = OCCUPIED;
+              whiteManCapture(n, moveList, sq+10);
+              b[sq+5] = tmp;
+            }
+          }
+          
+          // -4
+          if ((b[sq-4] & BLACK) != 0) {
+            if (b[sq-8] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq-8);
+              m = (WHITE|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq-4]; m = m << 8; m += (sq-4); moveList[n[0]].m[2] = m;
+              if (sq <= 17) {
+                m = (WHITE|KING); m = m << 8; m += (sq-8); moveList[n[0]].m[1] = m;
+                tmp = b[sq-4]; b[sq-4] = OCCUPIED;
+                whiteKingCapture(n, moveList, sq-8);
+                b[sq-4] = tmp;
+              } else {
+                m = (WHITE|MAN); m = m << 8; m += (sq-8); moveList[n[0]].m[1] = m;
+                tmp = b[sq-4]; b[sq-4] = OCCUPIED;
+                whiteManCapture(n, moveList, sq-8);
+                b[sq-4] = tmp;
+              }
+            }
+          }
+          
+          // -5
+          if ((b[sq-5] & WHITE) != 0) {
+            if (b[sq-10] & FREE ) {
+              moveList[n[0]].l = 3;
+              moveList[n[0]].path[1] = (sq-10);
+              m = (WHITE|MAN); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
+              m = b[sq-5]; m = m << 8; m += (sq-5); moveList[n[0]].m[2] = m;
+              if (sq <= 17) {
+                m = (WHITE|KING); m = m << 8; m += (sq-10); moveList[n[0]].m[1] = m;
+                tmp = b[sq-5]; b[sq-5] = OCCUPIED;
+                whiteKingCapture(n, moveList, sq-10);
+                b[sq-5] = tmp;
+              } else {
+                m = (WHITE|MAN); m = m << 8; m += (sq-10); moveList[n[0]].m[1] = m;
+                tmp = b[sq-5]; b[sq-5] = OCCUPIED;
+                whiteManCapture(n, moveList, sq-10);
+                b[sq-5] = tmp;
+              }
+            }
+          }
+            
+          b[sq] = (WHITE|MAN);
         }
+        
         if ((b[sq] & KING) != 0) {
           b[sq] = FREE;
           
