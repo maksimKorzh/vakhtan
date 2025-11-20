@@ -32,12 +32,12 @@ var board = [ // white on the right, black on the left
   [0, 6, 0, 0, 0, 5, 0, 5]*/
 
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 6, 0, 0, 0, 0, 0, 0],
+  [0, 0, 6, 0, 0, 0, 6, 0],
+  [0, 0, 0, 0, 0, 6, 0, 0],
+  [0, 0, 0, 0, 6, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 9, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
@@ -296,6 +296,40 @@ function testFrom02b(mloc) {
   do sq -= 4;
   while((b[sq] & EMPTY) != 0);
   if ((b[sq] & WHITE) != 0)
+    if ((b[sq-4] & EMPTY) != 0)
+      return 1;
+  return 0;
+}
+
+function testFrom13w(mloc) {
+  let sq;
+  sq = mloc;
+  do sq += 5;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & BLACK) != 0)
+    if ((b[sq+5] & EMPTY) != 0)
+      return 1;
+  sq = mloc;
+  do sq -= 5;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & BLACK) != 0)
+    if ((b[sq-5] & EMPTY) != 0)
+      return 1;
+  return 0;
+}
+
+function testFrom02w(mloc) {
+  let sq;
+  sq = mloc;
+  do sq += 4;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & BLACK) != 0)
+    if ((b[sq+4] & EMPTY) != 0)
+      return 1;
+  sq = mloc;
+  do sq -= 4;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & BLACK) != 0)
     if ((b[sq-4] & EMPTY) != 0)
       return 1;
   return 0;
