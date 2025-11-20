@@ -23,23 +23,23 @@ const MAXMOVES = 50;
 
 var b = new Array(46);
 var board = [ // white on the right, black on the left
-  /*[6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5]*/
+  [0, 6, 0, 0, 0, 5, 0, 5],
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5]
 
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  /*[0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 5, 0, 0, 0],
   [0, 6, 0, 6, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 6, 0, 6, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0]
+  [0, 0, 0, 0, 0, 0, 0, 0]*/
 ];
 
 const m2coord = [
@@ -525,7 +525,7 @@ function generateCaptures(moveList, color) {
           }
           
           // +5
-          if ((b[sq+5] & BLACK) != 0) {console.log('back')
+          if ((b[sq+5] & BLACK) != 0) {
             if (b[sq+10] & FREE ) {
               moveList[n[0]].l = 3;
               moveList[n[0]].path[1] = (sq+10);
@@ -1369,18 +1369,59 @@ function undoMove(move) {
   } ply--;
 }
 
+
+var nodes = 0;
+
+function perftDriver(depth, color) {
+  if (depth == 0) { nodes++; return; }
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]);
+    perftDriver(depth-1, color^CHANGECOLOR);
+    undoMove(moveList[i]);
+  }
+}
+
+function perftTest(depth, color) {
+  side = color;
+  nodes = 0;
+  console.log('\n    Performance test:\n\n');
+  let resultString = '';
+  let startTime = Date.now();
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]);
+    let cumNodes = nodes;
+    perftDriver(depth-1, color^CHANGECOLOR);
+    undoMove(moveList[i]);
+    let oldNodes = nodes - cumNodes;
+    console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
+  } resultString += '\n    Time: ' + (Date.now() - startTime) + ' ms';
+  resultString += '\n   Depth: ' + depth;
+  resultString += '\n   Nodes: ' + nodes;
+  console.log(resultString);
+}
+
 dsp2brd();
-printBoard();
 
-
-let moveList = createMoveList();
+/*let moveList = createMoveList();
 let n = generateCaptures(moveList, WHITE);
 printMoveList(moveList, n);
 makeMove(moveList[0]);
 printBoard();
 undoMove(moveList[0]);
 printBoard();
-//console.log(moveList);
+//console.log(moveList);*/
+
+printBoard();
+perftTest(3, WHITE);
+printBoard();
 
 </script>
 
