@@ -36,7 +36,7 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 9, 0, 5, 0],
+  [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
@@ -329,11 +329,11 @@ function testFrom02w(mloc) {
   return 0;
 }
 
-function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
+function blackKingCapture(n, moveList, j) {
   let m, temp, tmp, capSq, foundPd;
   let foundCap = 0;
   let move, orgMove;
-  orgMove = structuredClone(inputMove);
+  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
   
   // +4
   temp = j;
@@ -352,9 +352,9 @@ function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
         m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
         foundPd = 1;
         foundCap = 1;
-        inputMove = structuredClone(move);
+        moveList[n[0]] = structuredClone(move);
         tmp = b[capSq]; b[capSq] = OCCUPIED;
-        blackKingCapture(inputMove, temp);
+        blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 4;
       if (!foundPd) {
@@ -367,9 +367,9 @@ function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
           m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
           m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
           foundCap = 1;
-          inputMove = structuredClone(move);
+          moveList[n[0]] = structuredClone(move);
           tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(inputMove, temp);
+          blackKingCapture(n, moveList, temp);
           b[capSq] = tmp;
           temp += 4;
         }
@@ -395,12 +395,12 @@ function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
         m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
         foundPd = 1;
         foundCap = 1;
-        inputMove = structuredClone(move);
+        moveList[n[0]] = structuredClone(move);
         tmp = b[capSq]; b[capSq] = OCCUPIED;
-        blackKingCapture(inputMove, temp);
+        blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 5;
-      if (!foundPd) { console.log('+5')
+      if (!foundPd) {
         temp = capSq;
         temp += 5;
         while((b[temp] & FREE) != 0) {
@@ -410,9 +410,9 @@ function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
           m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
           m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
           foundCap = 1;
-          inputMove = structuredClone(move);
+          moveList[n[0]] = structuredClone(move);
           tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(inputMove, temp);
+          blackKingCapture(n, moveList, temp);
           b[capSq] = tmp;
           temp += 5;
         }
@@ -420,7 +420,7 @@ function blackKingCapture(inputMove, j) { console.log('input move', inputMove)
     }
   }
   
-  return inputMove;  
+  if (!foundCap) n[0]++;
 }
 
 function makeMove(move) {
@@ -453,14 +453,15 @@ function undoMove(move) {
 dsp2brd();
 printBoard();
 
-let moveList = createMoveList();
-let n = generateQuiets(moveList, WHITE);
-printMoveList(moveList, n);
+//let moveList = createMoveList();
+//let n = generateQuiets(moveList, WHITE);
+//printMoveList(moveList, n);
 
-//let move = createMove();
-//move.l=1;
-//let bcc = blackKingCapture(move, coord2sq['a7']);
-//console.log(bcc);
+let moveList = createMoveList();
+let n = [0];
+blackKingCapture(n, moveList, coord2sq['a7']);
+printMoveList(moveList, n);
+console.log(moveList);
 
 </script>
 
