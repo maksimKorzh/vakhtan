@@ -37,7 +37,7 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 9, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
@@ -267,19 +267,36 @@ function generateQuiets(color) {
   } return quiets;
 }
 
-function testFrom13b(mloc) { console.log('13b', sq2coord[mloc]);
+function testFrom13b(mloc) {
   let sq;
   sq = mloc;
-  do { sq += 5; console.log('slide+5', sq, sq2coord[sq], b[sq]&EMPTY)}
+  do sq += 5;
   while((b[sq] & EMPTY) != 0);
   if ((b[sq] & WHITE) != 0)
     if ((b[sq+5] & EMPTY) != 0)
       return 1;
   sq = mloc;
-  do { sq -= 5; console.log('slide-5', sq, sq2coord[sq]) }
+  do sq -= 5;
   while((b[sq] & EMPTY) != 0);
   if ((b[sq] & WHITE) != 0)
     if ((b[sq-5] & EMPTY) != 0)
+      return 1;
+  return 0;
+}
+
+function testFrom02b(mloc) {
+  let sq;
+  sq = mloc;
+  do sq += 4;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & WHITE) != 0)
+    if ((b[sq+4] & EMPTY) != 0)
+      return 1;
+  sq = mloc;
+  do sq -= 4;
+  while((b[sq] & EMPTY) != 0);
+  if ((b[sq] & WHITE) != 0)
+    if ((b[sq-4] & EMPTY) != 0)
       return 1;
   return 0;
 }
