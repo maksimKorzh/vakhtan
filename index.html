@@ -36,7 +36,7 @@ var board = [ // white on the right, black on the left
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 5, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
+  [0, 0, 0, 0, 9, 0, 5, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0]
@@ -149,8 +149,12 @@ function createMoveList() {
   return moveList;
 }
 
+function printMoveList(moveList, n) {
+  for (let i = 0; i < n; i++) console.log(move2str(moveList[i]));
+}
+
 function generateQuiets(moveList, color) {
-  let m = 0, temp = 0; n = 0;
+  let m = 0, temp = 0, n = 0;
   if (color == BLACK) {
     for (let sq = 5; sq <= 40; sq++) {
       if ((b[sq] & BLACK) != 0) {
@@ -254,7 +258,7 @@ function generateQuiets(moveList, color) {
         }
       }
     }
-  } return quiets;
+  } return n;
 }
 
 function testFrom13b(mloc) {
@@ -449,13 +453,14 @@ function undoMove(move) {
 dsp2brd();
 printBoard();
 
-//let quiets = generateQuiets(WHITE);
-//for (let quiet of quiets) console.log(move2str(quiet));
+let moveList = createMoveList();
+let n = generateQuiets(moveList, WHITE);
+printMoveList(moveList, n);
 
-let move = createMove();
+//let move = createMove();
 //move.l=1;
-let bcc = blackKingCapture(move, coord2sq['a7']);
-console.log(bcc);
+//let bcc = blackKingCapture(move, coord2sq['a7']);
+//console.log(bcc);
 
 </script>
 
