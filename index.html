@@ -13,6 +13,22 @@ var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var nodes = 0;
 
+const pieceScores = [0, 0, 0, 0, 0, 200, -200, 0, 0, 400, -400, 0, 0, 0, 0, 0, 0];
+const pst = [
+  0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,
+  5, 5, 5, 0, 0,
+  9, 9, 0, 0, 9,
+  9, 0, 0, 5, 5,
+  5, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,
+  0, 0
+]
+
+// 20, 21, 24, 25     +9
+// 15, 16, 17, 28, 29, 30  +5
 const testPositions = [
   'W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1',
   'W:Wd6,a3,g3,f2,h2,c1,g1:Bb8,f8,h8,b6,f6,h6,h4:H0:F1',
@@ -1280,6 +1296,19 @@ function undoMove(move) {
   } ply--;
 }
 
+function evaluate(color) {
+  let score = 0;
+  for (let sq = 5; sq <= 40; sq++) {
+    score += pieceScores[b[sq]];
+    switch (b[sq]) {
+      case 5: score += pst[sq]; break;
+      case 6: score -= pst[sq]; break;
+      case 9: score += pst[sq]; break;
+      case 10: score -= pst[sq]; break;
+    }
+  } return (color[0] == WHITE) ? score : -score;
+}
+
 function perftDriver(depth, color) {
   if (depth == 0) { nodes++; return; }
   let n, moveList;
@@ -1368,5 +1397,18 @@ function parseFen(fen, color) {
   } dsp2brd();
 }
 
-perftTestSuit(10);
+let color = [0];
+parseFen('W:Wa1:Bf4', color);
+printBoard();
+console.log(evaluate(color));
 </script>
+
+
+
+
+
+
+
+
+
+
