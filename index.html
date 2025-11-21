@@ -23,23 +23,23 @@ const MAXMOVES = 50;
 
 var b = new Array(46);
 var board = [ // white on the right, black on the left
-  /*[6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5]*/
+  [0, 6, 0, 0, 0, 5, 0, 5],
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 5, 0, 5]
 
-  [6, 0, 6, 0, 0, 0, 5, 0],
+  /*[6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 5, 0, 0, 0, 5],
   [6, 0, 0, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 0, 0, 0],
   [6, 0, 6, 0, 6, 0, 5, 0],
   [0, 6, 0, 0, 0, 0, 0, 5],
   [6, 0, 0, 0, 5, 0, 5, 0],
-  [0, 6, 0, 6, 0, 5, 0, 5]
+  [0, 6, 0, 6, 0, 5, 0, 5]*/
   
   /*[0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -939,22 +939,22 @@ function blackKingCapture(n, moveList, j) {
         blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 4;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp += 4;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp += 4;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp += 4;
-        }
       }
     }
   }
@@ -981,22 +981,22 @@ function blackKingCapture(n, moveList, j) {
         blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 5;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp += 5;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp += 5;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp += 5;
-        }
       }
     }
   }
@@ -1023,22 +1023,22 @@ function blackKingCapture(n, moveList, j) {
         blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp -= 4;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp -= 4;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp -= 4;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp -= 4;
-        }
       }
     }
   }
@@ -1051,8 +1051,6 @@ function blackKingCapture(n, moveList, j) {
   if ((b[temp] & WHITE) != 0) {
     capSq = temp;
     temp -= 5;
-    
-    
     while ((b[temp] & FREE) != 0) {
       if (testFrom02b(temp)) {
         move = structuredClone(orgMove);
@@ -1066,33 +1064,26 @@ function blackKingCapture(n, moveList, j) {
         tmp = b[capSq]; b[capSq] = OCCUPIED;
         blackKingCapture(n, moveList, temp);
         b[capSq] = tmp;
-      }
-      
-      temp -= 5;
-      
+      } temp -= 5;
     }
-      if (!foundPd) {
-        temp = capSq;
+    if (!foundPd) {
+      temp = capSq;
+      temp -= 5;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        blackKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp -= 5;
-        while((b[temp] & FREE) != 0) { console.log('no pd', sq2coord[temp]);
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (BLACK|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          blackKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp -= 5;
-        }
       }
-  }
-  
-  
-  
-  if (!foundCap) n[0]++;
+    }
+  } if (!foundCap) n[0]++;
 }
 
 
@@ -1213,22 +1204,22 @@ function whiteKingCapture(n, moveList, j) {
         whiteKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 4;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp += 4;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        whiteKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp += 4;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          whiteKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp += 4;
-        }
       }
     }
   }
@@ -1255,22 +1246,22 @@ function whiteKingCapture(n, moveList, j) {
         whiteKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp += 5;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp += 5;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        whiteKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp += 5;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          whiteKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp += 5;
-        }
       }
     }
   }
@@ -1297,22 +1288,22 @@ function whiteKingCapture(n, moveList, j) {
         whiteKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp -= 4;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp -= 4;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        whiteKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp -= 4;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          whiteKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp -= 4;
-        }
       }
     }
   }
@@ -1339,22 +1330,22 @@ function whiteKingCapture(n, moveList, j) {
         whiteKingCapture(n, moveList, temp);
         b[capSq] = tmp;
       } temp -= 5;
-      if (!foundPd) {
-        temp = capSq;
+    }
+    if (!foundPd) {
+      temp = capSq;
+      temp -= 5;
+      while((b[temp] & FREE) != 0) {
+        move = structuredClone(orgMove);
+        move.l++;
+        move.path[move.l-2] = temp;
+        m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
+        m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
+        foundCap = 1;
+        moveList[n[0]] = structuredClone(move);
+        tmp = b[capSq]; b[capSq] = OCCUPIED;
+        whiteKingCapture(n, moveList, temp);
+        b[capSq] = tmp;
         temp -= 5;
-        while((b[temp] & FREE) != 0) {
-          move = structuredClone(orgMove);
-          move.l++;
-          move.path[move.l-2] = temp;
-          m = (WHITE|KING); m = m << 8; m += temp; move.m[1] = m;
-          m = b[capSq]; m = m << 8; m += capSq; move.m[move.l-1] = m;
-          foundCap = 1;
-          moveList[n[0]] = structuredClone(move);
-          tmp = b[capSq]; b[capSq] = OCCUPIED;
-          whiteKingCapture(n, moveList, temp);
-          b[capSq] = tmp;
-          temp -= 5;
-        }
       }
     }
   } if (!foundCap) n[0]++;
@@ -1438,7 +1429,7 @@ printBoard();
 //console.log(moveList);*/
 
 printBoard();
-perftTest(1, BLACK);
+perftTest(10, WHITE);
 printBoard();
 
 </script>
