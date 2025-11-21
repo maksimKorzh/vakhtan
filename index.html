@@ -8,38 +8,34 @@ const FREE = 16
 const CHANGECOLOR = 3
 const MAXMOVES = 50;
 
-// 5s go from right to left
-// 6s go from left to right
-
-// actual
-// +4 Capture Up and Left
-// +5 Capture Up and Right
-// -4 Capture Down and Right
-// -5 Capture Down and Left 
-
-
-// in my view
-// -5 Capture Down and Left 
-
 var b = new Array(46);
 var board = [ // white on the right, black on the left
-  [6, 0, 6, 0, 0, 0, 5, 0],
+  /*[6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
   [0, 6, 0, 0, 0, 5, 0, 5],
   [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5]
+  [0, 6, 0, 0, 0, 5, 0, 5]*/
 
   /*[6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 5, 0, 0, 0, 5],
-  [6, 0, 0, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 0, 0, 0],
-  [6, 0, 6, 0, 6, 0, 5, 0],
   [0, 6, 0, 0, 0, 0, 0, 5],
-  [6, 0, 0, 0, 5, 0, 5, 0],
-  [0, 6, 0, 6, 0, 5, 0, 5]*/
+  [6, 0, 6, 0, 0, 0, 0, 0],
+  [0, 6, 0, 0, 0, 0, 0, 0],
+  [6, 0, 6, 0, 6, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 5],
+  [6, 0, 6, 0, 5, 0, 5, 0],
+  [0, 6, 0, 0, 0, 0, 0, 5]*/
+  
+  [6, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 0, 0, 0],
+  [6, 0, 0, 0, 0, 0, 5, 0],
+  [0, 6, 0, 6, 0, 0, 0, 0],
+  [6, 0, 0, 0, 6, 0, 5, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [9, 0, 6, 0, 0, 0, 5, 0],
+  [0, 6, 0, 0, 0, 0, 0, 5]
   
   /*[0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -626,7 +622,7 @@ function generateCaptures(moveList, color) {
                 m = (WHITE|KING); m = m << 8; m += sq; moveList[n[0]].m[0] = m;
                 m = b[capSq]; m = m << 8; m += capSq; moveList[n[0]].m[2] = m;
                 tmp = b[capSq]; b[capSq] = OCCUPIED;
-                blackKingCapture(n, moveList, temp);
+                whiteKingCapture(n, moveList, temp);
                 b[capSq] = tmp;
                 temp += 4;
               }
@@ -1388,9 +1384,9 @@ function perftDriver(depth, color) {
   n = generateCaptures(moveList, color);
   if (!n) n = generateQuiets(moveList, color);
   for (let i = 0; i < n; i++) {
-    makeMove(moveList[i]);
+    makeMove(moveList[i]); //printBoard();
     perftDriver(depth-1, color^CHANGECOLOR);
-    undoMove(moveList[i]);
+    undoMove(moveList[i]); //printBoard();
   }
 }
 
@@ -1424,12 +1420,13 @@ let n = generateCaptures(moveList, WHITE);
 printMoveList(moveList, n);
 makeMove(moveList[0]);
 printBoard();
-undoMove(moveList[0]);
-printBoard();
-//console.log(moveList);*/
+//undoMove(moveList[0]);
+//printBoard();
+console.log(moveList);*/
 
 printBoard();
-perftTest(10, WHITE);
+perftTest(1, WHITE);
 printBoard();
+
 
 </script>
