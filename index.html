@@ -1309,6 +1309,50 @@ function evaluate(color) {
   } return (color[0] == WHITE) ? score : -score;
 }
 
+function search(depth, color) {
+  nodes = 0;
+  let bestMove = null;
+  const originalDepth = depth;
+  console.log('Searching root moves:');
+  
+  function quiescence() {
+    nodes++;
+    let standPat = evaluate(color);
+    let n, moveList;
+    moveList = createMoveList();
+    n = generateCaptures(moveList, color);
+    let bestScore = standPat;
+    for (let i = 0; i < n; i++) {
+      makeMove(moveList[i]);
+      let score = -quiescence();
+      undoMove(moveList[i]);
+      if (score > bestScore) bestScore = score;
+    } return bestScore;
+  }
+  
+  function negamax(depth) {
+    if (depth === 0) return quiescence(color);
+    let bestScore = -Infinity;
+    let n, moveList;
+    moveList = createMoveList();
+    n = generateCaptures(moveList, color);
+    if (!n) n = generateQuiets(moveList, color);
+    for (let i = 0; i < n; i++) {
+      makeMove(moveList[i]);
+      let cumNodes = nodes;
+      let score = -negamax(depth - 1);
+      undoMove(moveList[i]);
+      let oldNodes = nodes - cumNodes;
+      if (depth == originalDepth) console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
+      if (score > bestScore) {
+        bestScore = score;
+        if (depth === originalDepth) bestMove = moveList[i];
+      }
+    } return bestScore;
+  } const bestScore = negamax(depth);
+  return { bestScore, bestMove };
+}
+
 function perftDriver(depth, color) {
   if (depth == 0) { nodes++; return; }
   let n, moveList;
@@ -1323,7 +1367,6 @@ function perftDriver(depth, color) {
 }
 
 function perftTest(depth, color) {
-  side = color;
   nodes = 0;
   console.log('\n    Performance test:\n\n');
   printBoard();
@@ -1398,9 +1441,10 @@ function parseFen(fen, color) {
 }
 
 let color = [0];
-parseFen('W:Wa1:Bf4', color);
+parseFen(startFen, color);
 printBoard();
-console.log(evaluate(color));
+search(5, color);
+
 </script>
 
 
