@@ -8,53 +8,8 @@ const FREE = 16
 const CHANGECOLOR = 3
 const MAXMOVES = 50;
 
-var b = new Array(46);
-var board = [ // white on the right, black on the left
-  [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5],
-  [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5],
-  [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5],
-  [6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 5, 0, 5]
-
-  /*[6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 0, 0, 5],
-  [6, 0, 6, 0, 0, 0, 0, 0],
-  [0, 6, 0, 0, 0, 0, 0, 0],
-  [6, 0, 6, 0, 6, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 5],
-  [6, 0, 6, 0, 5, 0, 5, 0],
-  [0, 6, 0, 0, 0, 0, 0, 5]*/
-  
-  /*[6, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 0, 0, 0],
-  [6, 0, 0, 0, 0, 0, 5, 0],
-  [0, 6, 0, 6, 0, 0, 0, 0],
-  [6, 0, 0, 0, 6, 0, 5, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [9, 0, 6, 0, 0, 0, 5, 0],
-  [0, 6, 0, 0, 0, 0, 0, 5]*/
-  
-  /*[0, 0, 6, 0, 0, 0, 0, 0],  // Turkish
-  [0, 6, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 5, 0, 5, 0],
-  [0, 0, 0, 0, 0, 5, 0, 0],
-  [0, 0, 6, 0, 5, 0, 0, 0],
-  [0, 0, 0, 0, 0, 5, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0,10, 0, 0, 0, 0]*/
-  
-  /*[0, 0, 0, 0, 0, 0, 5, 0],  // Double
-  [0, 0, 0, 0, 0, 5, 0, 0],
-  [0, 0, 0, 0, 0, 0, 5, 0],
-  [0, 6, 0, 6, 0, 0, 0, 9],
-  [0, 0, 6, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 6, 0, 0],
-  [0, 0, 6, 0, 0, 0, 0, 0],
-  [0, 6, 0, 0, 0, 0, 0, 0]*/
-];
+var b = new Array(46).fill(0);
+var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 
 const m2coord = [
   'xx',
@@ -1403,6 +1358,8 @@ function perftTest(depth, color) {
   side = color;
   nodes = 0;
   console.log('\n    Performance test:\n\n');
+  printBoard();
+  console.log('Side to move: ' + (color == 2 ? 'black' : 'white'));
   let resultString = '';
   let startTime = Date.now();
   let n, moveList;
@@ -1422,20 +1379,61 @@ function perftTest(depth, color) {
   console.log(resultString);
 }
 
-dsp2brd();
+function parseFen(fen, color) {
+  b = new Array(46).fill(0);
+  board = new Array(8).fill(0).map(() => new Array(8).fill(0));
+  color[0] = fen[0] == 'W' ? WHITE : BLACK;
+  let i = 2;
+  let pce = WHITE;
+  let rank = MAN;
+  while (i < fen.length) {
+    let c = fen[i];
+    var row, col;
+    switch(c) {
+      case 'B': pce = BLACK; break;
+      case 'K': rank = KING;
+      case 'a': row = 7; break;
+      case 'b': row = 6; break;
+      case 'c': row = 5; break;
+      case 'd': row = 4; break;
+      case 'e': row = 3; break;
+      case 'f': row = 2; break;
+      case 'g': row = 1; break;
+      case 'h': row = 0; break;
+      case '1': col = 7; break;
+      case '2': col = 6; break;
+      case '3': col = 5; break;
+      case '4': col = 4; break;
+      case '5': col = 3; break;
+      case '6': col = 2; break;
+      case '7': col = 1; break;
+      case '8': col = 0; break;
+      case ':':
+      case ',':
+        board[row][col] = pce|rank;
+        rank = MAN;
+        break;
+      
+    } i++;
+    if (i == fen.length) board[row][col] = pce|rank;
+  } dsp2brd();
+}
 
-/*let moveList = createMoveList();
-let n = generateCaptures(moveList, WHITE);
-printMoveList(moveList, n);
-makeMove(moveList[0]);
-printBoard();
-//undoMove(moveList[0]);
-//printBoard();
-console.log(moveList);*/
+function perftTestSuit(depth) {
+  let color = [0];
+  let fens = [
+    'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6',
+    'B:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6',
+    'W:Wd4:Bc7,e7,e5,g5,g3',
+    'B:Wc7,e7,e5,g5,g3:Bd4',
+    'W:We5:Bb6,b4,d4,d2,f2',
+    'B:Wb6,b4,d4,d2,f2:Be5',
+  ];
+  for (let fen of fens) {
+    parseFen(fen, color);
+    perftTest(depth, color);
+  }
+}
 
-printBoard();
-perftTest(10, WHITE);
-printBoard();
-
-
+perftTestSuit(5);
 </script>
