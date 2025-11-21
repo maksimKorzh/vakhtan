@@ -8,8 +8,25 @@ const FREE = 16
 const CHANGECOLOR = 3
 const MAXMOVES = 50;
 
+const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
+var nodes = 0;
+
+const testPositions = [
+  'W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1',
+  'W:Wd6,a3,g3,f2,h2,c1,g1:Bb8,f8,h8,b6,f6,h6,h4:H0:F1',
+  'B:Wc5,e5,b4,a3,e3,f2,h2,g1:Bb8,h8,a7,c7,g7,h6,g5,h4:H0:F1',
+  'W:Wc5,b4,d4,f4,a3,f2,h2,g1:Bd8,a7,e7,g7,d6,f6,h6,h4:H0:F1',
+  'W:Wc5,e5,d4,g3,d2,f2,a1,c1,e1,g1:Bf8,h8,a7,c7,e7,g7,b6,h6,a5,g5:H0:F1',
+  'B:Wb4,d4,f4,a3,e3,g3,b2,d2,f2,a1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,b6,h6,c5,g5,h4:H0:F1',
+  'W:Wa5,d4,f4,a3,c3,e3,h2,c1:Bb8,a7,c7,b6,f6,h6,c5,g5:H0:F1',
+  'W:Wg5,f4,h4,a3,e3,d2:Bf8,h8,e7,b6,d6,h6:H0:F1',
+  'W:Wd4,f4,h4,a3,c3:Bd8,e7,b6,h6,c5:H0:F1',
+  'W:Wd4,f4,a3,c3,e3,d2,f2,h2,c1,e1,g1:Bb8,d8,f8,h8,a7,b6,d6,h6,c5,g5,h4:H0:F1',
+  'W:Wc5,d4,f4,h4,g3,h2,e1:Bf8,a7,e7,g7,d6,a5:H0:F1',
+  'B:Wd4,f4,a3,e3,b2,f2,h2,e1,g1:Bb8,d8,h8,g7,b6,d6,h6,a5,c5,h4:H0:F1'
+];
 
 const m2coord = [
   'xx',
@@ -238,8 +255,6 @@ function generateCaptures(moveList, color) {
       if ((b[sq] & BLACK) != 0) {
         if ((b[sq] & MAN) != 0) {
           b[sq] = FREE;
-          
-          // +4
           if ((b[sq+4] & WHITE) != 0) {
             if (b[sq+8] & FREE ) {
               moveList[n[0]].l = 3;
@@ -259,8 +274,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // +5
           if ((b[sq+5] & WHITE) != 0) {
             if (b[sq+10] & FREE ) {
               moveList[n[0]].l = 3;
@@ -280,8 +293,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -4
           if ((b[sq-4] & WHITE) != 0) {
             if (b[sq-8] & FREE ) {
               moveList[n[0]].l = 3;
@@ -294,8 +305,6 @@ function generateCaptures(moveList, color) {
               b[sq-4] = tmp;
             }
           }
-          
-          // -5
           if ((b[sq-5] & WHITE) != 0) {
             if (b[sq-10] & FREE ) {
               moveList[n[0]].l = 3;
@@ -307,15 +316,10 @@ function generateCaptures(moveList, color) {
               blackManCapture(n, moveList, sq-10);
               b[sq-5] = tmp;
             }
-          }
-          
-          b[sq] = (BLACK|MAN);
+          } b[sq] = (BLACK|MAN);
         }
-    
         if ((b[sq] & KING) != 0) {
           b[sq] = FREE;
-          
-          // +4
           temp = sq;
           foundPd = 0;
           do temp += 4
@@ -352,8 +356,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // +5
           temp = sq;
           foundPd = 0;
           do temp += 5
@@ -390,8 +392,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -4
           temp = sq;
           foundPd = 0;
           do temp -= 4
@@ -428,8 +428,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -5
           temp = sq;
           foundPd = 0;
           do temp -= 5
@@ -465,21 +463,16 @@ function generateCaptures(moveList, color) {
                 temp -= 5;
               }
             }
-          }
-          
-          b[sq] = (BLACK|KING);
+          } b[sq] = (BLACK|KING);
         }
       }
     }
   }
-
   if (color == WHITE) {
     for (sq = 5; sq <= 40; sq++) {
       if ((b[sq] & WHITE) != 0) {
         if ((b[sq] & MAN) != 0) {
           b[sq] = FREE;
-          
-          // +4
           if ((b[sq+4] & BLACK) != 0) {
             if (b[sq+8] & FREE ) {
               moveList[n[0]].l = 3;
@@ -492,8 +485,6 @@ function generateCaptures(moveList, color) {
               b[sq+4] = tmp;
             }
           }
-          
-          // +5
           if ((b[sq+5] & BLACK) != 0) {
             if (b[sq+10] & FREE ) {
               moveList[n[0]].l = 3;
@@ -506,8 +497,6 @@ function generateCaptures(moveList, color) {
               b[sq+5] = tmp;
             }
           }
-          
-          // -4
           if ((b[sq-4] & BLACK) != 0) {
             if (b[sq-8] & FREE ) {
               moveList[n[0]].l = 3;
@@ -527,8 +516,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -5
           if ((b[sq-5] & BLACK) != 0) {
             if (b[sq-10] & FREE ) {
               moveList[n[0]].l = 3;
@@ -547,15 +534,10 @@ function generateCaptures(moveList, color) {
                 b[sq-5] = tmp;
               }
             }
-          }
-            
-          b[sq] = (WHITE|MAN);
+          } b[sq] = (WHITE|MAN);
         }
-        
         if ((b[sq] & KING) != 0) {
           b[sq] = FREE;
-          
-          // +4
           temp = sq;
           foundPd = 0;
           do temp += 4
@@ -592,8 +574,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // +5
           temp = sq;
           foundPd = 0;
           do temp += 5
@@ -630,8 +610,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -4
           temp = sq;
           foundPd = 0;
           do temp -= 4
@@ -668,8 +646,6 @@ function generateCaptures(moveList, color) {
               }
             }
           }
-          
-          // -5
           temp = sq;
           foundPd = 0;
           do temp -= 5
@@ -705,9 +681,7 @@ function generateCaptures(moveList, color) {
                 temp -= 5;
               }
             }
-          }
-          
-          b[sq] = (WHITE|KING);
+          } b[sq] = (WHITE|KING);
         }
       }
     }
@@ -786,9 +760,7 @@ function blackManCapture(n, moveList, j) {
   let m, temp, tmp;
   let foundCap = 0;
   let move, orgMove;
-  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
-
-  // +4
+  orgMove = structuredClone(moveList[n[0]]);
   if ((b[j+4] & WHITE) != 0) {
     if (b[j+8] & FREE ) {
       move = structuredClone(orgMove);
@@ -812,8 +784,6 @@ function blackManCapture(n, moveList, j) {
       }
     }
   }
-  
-  // +5
   if ((b[j+5] & WHITE) != 0) {
     if (b[j+10] & FREE ) {
       move = structuredClone(orgMove);
@@ -837,8 +807,6 @@ function blackManCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -4
   if ((b[j-4] & WHITE) != 0) {
     if (b[j-8] & FREE ) {
       move = structuredClone(orgMove);
@@ -853,8 +821,6 @@ function blackManCapture(n, moveList, j) {
       b[j-4] = tmp;
     }
   }
-  
-  // +5
   if ((b[j-5] & WHITE) != 0) {
     if (b[j-10] & FREE ) {
       move = structuredClone(orgMove);
@@ -875,9 +841,7 @@ function blackKingCapture(n, moveList, j) {
   let m, temp, tmp, capSq, foundPd;
   let foundCap = 0;
   let move, orgMove;
-  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
-  
-  // +4
+  orgMove = structuredClone(moveList[n[0]]);
   temp = j;
   foundPd = 0;
   do temp += 4;
@@ -918,8 +882,6 @@ function blackKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // +5
   temp = j;
   foundPd = 0;
   do temp += 5;
@@ -960,8 +922,6 @@ function blackKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -4
   temp = j;
   foundPd = 0;
   do temp -= 4;
@@ -1002,8 +962,6 @@ function blackKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -5
   temp = j;
   foundPd = 0;
   do temp -= 5;
@@ -1051,9 +1009,7 @@ function whiteManCapture(n, moveList, j) {
   let m, temp, tmp;
   let foundCap = 0;
   let move, orgMove;
-  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
-
-  // +4
+  orgMove = structuredClone(moveList[n[0]]);
   if ((b[j+4] & BLACK) != 0) {
     if (b[j+8] & FREE ) {
       move = structuredClone(orgMove);
@@ -1068,8 +1024,6 @@ function whiteManCapture(n, moveList, j) {
       b[j+4] = tmp;
     }
   }
-  
-  // +5
   if ((b[j+5] & BLACK) != 0) {
     if (b[j+10] & FREE ) {
       move = structuredClone(orgMove);
@@ -1084,8 +1038,6 @@ function whiteManCapture(n, moveList, j) {
       b[j+5] = tmp;
     }
   }
-  
-  // -4
   if ((b[j-4] & BLACK) != 0) {
     if (b[j-8] & FREE ) {
       move = structuredClone(orgMove);
@@ -1109,8 +1061,6 @@ function whiteManCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -5
   if ((b[j-5] & BLACK) != 0) {
     if (b[j-10] & FREE ) {
       move = structuredClone(orgMove);
@@ -1140,9 +1090,7 @@ function whiteKingCapture(n, moveList, j) {
   let m, temp, tmp, capSq, foundPd;
   let foundCap = 0;
   let move, orgMove;
-  orgMove = structuredClone(moveList[n[0]]); // fake *n pointer
-  
-  // +4
+  orgMove = structuredClone(moveList[n[0]]);
   temp = j;
   foundPd = 0;
   do temp += 4;
@@ -1183,8 +1131,6 @@ function whiteKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // +5
   temp = j;
   foundPd = 0;
   do temp += 5;
@@ -1225,8 +1171,6 @@ function whiteKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -4
   temp = j;
   foundPd = 0;
   do temp -= 4;
@@ -1267,8 +1211,6 @@ function whiteKingCapture(n, moveList, j) {
       }
     }
   }
-  
-  // -5
   temp = j;
   foundPd = 0;
   do temp -= 5;
@@ -1338,9 +1280,6 @@ function undoMove(move) {
   } ply--;
 }
 
-
-var nodes = 0;
-
 function perftDriver(depth, color) {
   if (depth == 0) { nodes++; return; }
   let n, moveList;
@@ -1377,6 +1316,16 @@ function perftTest(depth, color) {
   resultString += '\n   Depth: ' + depth;
   resultString += '\n   Nodes: ' + nodes;
   console.log(resultString);
+}
+
+function perftTestSuit(depth) {
+  let color = [0];
+  parseFen(startFen, color);
+  perftTest(depth, color);
+  for (let fen of testPositions) {
+    parseFen(fen, color);
+    perftTest(depth, color);
+  }
 }
 
 function parseFen(fen, color) {
@@ -1419,21 +1368,5 @@ function parseFen(fen, color) {
   } dsp2brd();
 }
 
-function perftTestSuit(depth) {
-  let color = [0];
-  let fens = [
-    'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6',
-    'B:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6',
-    'W:Wd4:Bc7,e7,e5,g5,g3',
-    'B:Wc7,e7,e5,g5,g3:Bd4',
-    'W:We5:Bb6,b4,d4,d2,f2',
-    'B:Wb6,b4,d4,d2,f2:Be5',
-  ];
-  for (let fen of fens) {
-    parseFen(fen, color);
-    perftTest(depth, color);
-  }
-}
-
-perftTestSuit(5);
+perftTestSuit(10);
 </script>
