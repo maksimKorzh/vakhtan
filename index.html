@@ -65,14 +65,16 @@ let blackKing = `
 
 let emptySq = '<span style=\'visibility:hidden\'>' + whiteMan + '</span>';
 
-const OCCUPIED = 0
-const WHITE = 1
-const BLACK = 2
-const MAN = 4
-const KING = 8
-const FREE = 16
-const CHANGECOLOR = 3
+const OCCUPIED = 0;
+const WHITE = 1;
+const BLACK = 2;
+const MAN = 4;
+const KING = 8;
+const FREE = 16;
+const CHANGECOLOR = 3;
 const MAXMOVES = 50;
+const INFINITY = 100000;
+const WIN = 10000;
 
 const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 var b = new Array(46).fill(0);
@@ -1465,41 +1467,45 @@ function evaluate(color) {
   } return (color == WHITE) ? score : -score;
 }
 
-function quiescence(color) {
+function quiescence(alpha, beta, color) {
+  nodes++;
   let standPat = evaluate(color);
+  if (standPat >= beta) return standPat;
+  if (standPat > alpha) alpha = standPat;
   let n, moveList;
   moveList = createMoveList();
   n = generateCaptures(moveList, color);
-  let bestScore = standPat;
+  if (n == 0) return standPat;
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
-    let score = -quiescence(color^CHANGECOLOR);
+    let score = -quiescence(-beta, -alpha, color^CHANGECOLOR);
     undoMove(moveList[i]);
-    if (score > bestScore) bestScore = score;
-  } nodes++;
-  return bestScore;
+    if (score >= beta) return score; // fail-soft beta
+    if (score > alpha) alpha = score;
+  } return alpha;
 }
   
-function negamax(depth, originalDepth, color, bestMove) {
-  if (depth === 0) return quiescence(color);
-  let bestScore = -Infinity;
+function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
+  if (depth === 0) return quiescence(alpha, beta, color);
   let n, moveList;
   moveList = createMoveList();
   n = generateCaptures(moveList, color);
   if (!n) n = generateQuiets(moveList, color);
+  if (!n) return -WIN + ply;
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
     let cumNodes = nodes;
-    let score  = -negamax(depth - 1, originalDepth, color^CHANGECOLOR, bestMove);
+    let score  = -negamax(depth - 1, -beta, -alpha, originalDepth, color^CHANGECOLOR, bestMove);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
     if (depth == originalDepth)
       print('move ' + move2str(moveList[i]) + ' score ' + score + ' nodes ' + oldNodes);
-    if (score > bestScore) {
-      bestScore = score;
+    if (score > alpha) {
+      if (score >= beta) return beta;
+      alpha = score;
       if (depth === originalDepth) bestMove[0] = structuredClone(moveList[i]);
     }
-  } return bestScore;
+  } return alpha;
 }
   
 function search(depth, color) {
@@ -1508,7 +1514,8 @@ function search(depth, color) {
   let bestScore = null;
   const originalDepth = depth;
   print('side ' + (color == 2 ? 'black' : 'white'));
-  bestScore = negamax(depth, originalDepth, color, bestMove);
+  print('thinking...');
+  bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
   print('best ' + move2str(bestMove[0]) + ' score ' + bestScore + ' nodes ' + nodes);
   return bestMove[0];
 }
@@ -1649,9 +1656,9 @@ document.getElementById('flip').addEventListener('click', () => {
   drawBoard();
 });
 
-parseFen(startFen, side);
-//searchDepth = 11;
-//parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
+//parseFen(startFen, side);
+searchDepth = 11;
+parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
 drawBoard();
 
 </script>
