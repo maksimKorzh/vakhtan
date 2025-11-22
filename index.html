@@ -1520,6 +1520,15 @@ function makeEngineMove() {
   gameMoves.push(move);
   side[0] ^= CHANGECOLOR;
   drawBoard();
+  let m = move2str(move).replace('x', '-');
+  let src = m.split('-')[0];
+  let sr = 8-parseInt(src[1]);
+  let sc = 7-'abcdefgh'.indexOf(src[0]);
+  document.getElementById(sc + ':' + sr).classList.add('highlight');
+  let dst = m.split('-')[1];
+  let dr = 8-parseInt(dst[1]);
+  let dc = 7-'abcdefgh'.indexOf(dst[0]);
+  document.getElementById(dc + ':' + dr).classList.add('highlight');
 }
 
 function drawBoard() {
