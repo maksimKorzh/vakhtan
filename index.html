@@ -1515,7 +1515,6 @@ function search(depth, color) {
   let bestScore = null;
   const originalDepth = depth;
   print('side ' + (color == 2 ? 'black' : 'white'));
-  print('thinking...');
   bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
   let printScore = '';
   let printMove = move2str(bestMove[0]) != 'b8-b8' ? `best ${move2str(bestMove[0])}` : 'no moves';
@@ -1664,20 +1663,10 @@ document.getElementById('flip').addEventListener('click', () => {
   drawBoard();
 });
 
-//parseFen(startFen, side);
-searchDepth = 11;
-parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
+parseFen(startFen, side);
+searchDepth = 9;
+//parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
 drawBoard();
-
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
