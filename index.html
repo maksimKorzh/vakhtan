@@ -34,27 +34,33 @@ var clickLock = 0;
 var userSrc, userDst;
 
 let blackMan = `
-  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
-  ${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="white" stroke-width="2"/><circle cx="${size / 2}"
-  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="white" stroke-width="2"/></svg>
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle">
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="lightgrey" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="lightgrey" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/4)}" fill="none" stroke="lightgrey" stroke-width="2"/>
+  </svg>
 `;
 
 let whiteMan = `
-  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
-  ${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="black" stroke-width="2"/><circle cx="${size / 2}" 
-  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="black" stroke-width="2"/></svg>
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle">
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="black" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="black" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/4)}" fill="none" stroke="black" stroke-width="2"/>
+  </svg>
 `;
 
 let whiteKing = `
-  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
-  ${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="#222" stroke-width="2"/><circle cx="${size / 2}" 
-  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="#222" stroke-width="6"/></svg>
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle">
+    <circle cx=" ${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="#222" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/4)}" fill="none" stroke="black" stroke-width="2"/>
+  </svg>
 `;
 
 let blackKing = `
-  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
-  ${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="white" stroke-width="2"/><circle cx="${size / 2}" 
-  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="white" stroke-width="6"/></svg>
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle">
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="lightgrey" stroke-width="2"/>
+    <circle cx="${size / 2}" cy="${size / 2}" r="${radius-(radius/4)}" fill="none" stroke="lightgrey" stroke-width="2"/>
+  </svg>
 `;
 
 let emptySq = '<span style=\'visibility:hidden\'>' + whiteMan + '</span>';
