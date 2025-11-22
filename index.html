@@ -1561,6 +1561,7 @@ function userMove(coord) {
     for (let move of legalMoves) {
       if (move.dst == dst) {
         makeMove(move.m);
+        gameMoves.push(move.m);
         side ^= CHANGECOLOR;
         break;
       }
@@ -1569,6 +1570,15 @@ function userMove(coord) {
     //setTimeout(function() { search(searchDepth) }, 100);
   }
 }
+
+document.getElementById('undo').addEventListener('click', () => {
+  if (!gameMoves.length) return;
+  let lastMove = gameMoves[gameMoves.length-1];
+  undoMove(lastMove);
+  side ^= CHANGECOLOR;
+  gameMoves.pop();
+  drawBoard();
+});
 
 document.getElementById('flip').addEventListener('click', () => {
   flip ^= 1;
