@@ -1501,7 +1501,7 @@ function search(depth, color) {
   let bestMove = [createMove()];
   let bestScore = null;
   const originalDepth = depth;
-  console.log('Searching root moves:');
+  print('side ' + (side[0] == 2 ? 'black' : 'white'));
   bestScore = negamax(depth, originalDepth, color, bestMove);
   print('best ' + move2str(bestMove[0]) + ' score ' + bestScore + ' nodes ' + nodes);
   return bestMove[0];
@@ -1512,7 +1512,7 @@ function makeEngineMove() {
   let move = search(searchDepth, side);
   makeMove(move);
   gameMoves.push(move);
-  side ^= CHANGECOLOR;
+  side[0] ^= CHANGECOLOR;
   drawBoard();
 }
 
@@ -1561,7 +1561,7 @@ function userMove(coord) {
   let col = parseInt(coord.split(':')[1]);
   if (clickLock && board[row][col] != 16) clickLock = 0;
   if(!clickLock && board[row][col] != 16) {
-    if ((board[row][col] & CHANGECOLOR) != side) return;
+    if ((board[row][col] & CHANGECOLOR) != side[0]) return;
     for (let row = 0; row < 8; row++)
       for (let col = 0; col < 8; col++)
         document.getElementById(row+':'+col).classList.remove('highlight');
@@ -1591,7 +1591,7 @@ function userMove(coord) {
       if (move.dst == dst) {
         makeMove(move.m);
         gameMoves.push(move.m);
-        side ^= CHANGECOLOR;
+        side[0] ^= CHANGECOLOR;
         break;
       }
     } clickLock = 0;
@@ -1619,7 +1619,7 @@ document.getElementById('undo').addEventListener('click', () => {
   if (!gameMoves.length) return;
   let lastMove = gameMoves[gameMoves.length-1];
   undoMove(lastMove);
-  side ^= CHANGECOLOR;
+  side[0] ^= CHANGECOLOR;
   gameMoves.pop();
   drawBoard();
 });
