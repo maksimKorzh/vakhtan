@@ -22,7 +22,7 @@ button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; ba
 <button id="move">Move</button>
 <button id="flip">Flip</button>
 </div>
-<div id="console"></div>
+<div id="out"></div>
 </div>
 <script>
 let width = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
@@ -154,9 +154,10 @@ function printMoveList(moveList, n) {
 }
 
 function print(msg) {
-  let console =  document.getElementById('console');
-  console.innerHTML += msg;
-  console.scrollTop = console.scrollHeight;
+  let out =  document.getElementById('out');
+  out.innerHTML += '&nbsp' + msg + '<br>';
+  out.scrollTop = out.scrollHeight;
+  console.log(msg);
 }
 
 function move2str(move) {
@@ -1472,7 +1473,7 @@ function quiescence(color) {
   return bestScore;
 }
   
-function negamax(depth, originalDepth, color) {
+function negamax(depth, originalDepth, color, bestMove) {
   if (depth === 0) return quiescence(color);
   let bestScore = -Infinity;
   let n, moveList;
@@ -1482,23 +1483,26 @@ function negamax(depth, originalDepth, color) {
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
     let cumNodes = nodes;
-    let score = -negamax(depth - 1, originalDepth, color&CHANGECOLOR);
+    let score  = -negamax(depth - 1, originalDepth, color&CHANGECOLOR, bestMove);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
-    if (depth == originalDepth) print('&nbspMove: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes + '<br>');
+    if (depth == originalDepth)
+      print('move ' + move2str(moveList[i]) + ' score ' + score + ' nodes ' + oldNodes);
     if (score > bestScore) {
       bestScore = score;
-      if (depth === originalDepth) bestMove = moveList[i];
+      if (depth === originalDepth) bestMove[0] = structuredClone(moveList[i]);
     }
   } return bestScore;
 }
   
 function search(depth, color) {
   nodes = 0;
-  let bestMove = null;
+  let bestMove = [createMove()];
+  let bestScore = null;
   const originalDepth = depth;
   console.log('Searching root moves:');
-  const bestScore = negamax(depth, originalDepth, color);
+  bestScore = negamax(depth, originalDepth, color, bestMove);
+  print('best ' + move2str(bestMove[0]) + ' score ' + bestScore + ' nodes ' + nodes);
   return { bestScore, bestMove };
 }
 
@@ -1537,7 +1541,7 @@ function drawBoard() {
   let boardWidth = (document.getElementById('board').offsetWidth) + 'px';
   document.getElementById('fen').style = 'width: ' + boardWidth +
   '; font-size: inherit; text-align: center; height: 50px; margin-top: 10px;';
-  document.getElementById('console').style = 'width: ' + boardWidth +
+  document.getElementById('out').style = 'width: ' + boardWidth +
   '; font-size: inherit; height: 100%; overflow: hidden; margin-top: 10px; margin-bottom: 10px;; border: 1px solid black;';
   document.getElementById('buttons').style.width = boardWidth;
 }
