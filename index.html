@@ -22,6 +22,7 @@ button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; ba
 <button id="move">Move</button>
 <button id="flip">Flip</button>
 </div>
+<div id="console"></div>
 </div>
 <script>
 let width = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
@@ -72,6 +73,7 @@ var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var side = [];
 var legalMoves = [];
 var gameMoves = [];
+var searchDepth = 5;
 var nodes = 0;
 var ply = 0;
 
@@ -149,6 +151,12 @@ function printBoard() {
 
 function printMoveList(moveList, n) {
   for (let i = 0; i < n; i++) console.log(move2str(moveList[i]));
+}
+
+function print(msg) {
+  let console =  document.getElementById('console');
+  console.innerHTML += msg;
+  console.scrollTop = console.scrollHeight;
 }
 
 function move2str(move) {
@@ -1477,7 +1485,7 @@ function negamax(depth, originalDepth, color) {
     let score = -negamax(depth - 1, originalDepth, color&CHANGECOLOR);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
-    if (depth == originalDepth) console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
+    if (depth == originalDepth) print('&nbspMove: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes + '<br>');
     if (score > bestScore) {
       bestScore = score;
       if (depth === originalDepth) bestMove = moveList[i];
@@ -1527,7 +1535,10 @@ function drawBoard() {
   } boardHTML+= '</table>';
   document.getElementById('board').innerHTML = boardHTML;
   let boardWidth = (document.getElementById('board').offsetWidth) + 'px';
-  document.getElementById('fen').style = 'width: ' + boardWidth + '; font-size: inherit; text-align: center; height: 50px; margin-top: 10px;';
+  document.getElementById('fen').style = 'width: ' + boardWidth +
+  '; font-size: inherit; text-align: center; height: 50px; margin-top: 10px;';
+  document.getElementById('console').style = 'width: ' + boardWidth +
+  '; font-size: inherit; height: 100%; overflow: hidden; margin-top: 10px; margin-bottom: 10px;; border: 1px solid black;';
   document.getElementById('buttons').style.width = boardWidth;
 }
 
@@ -1582,6 +1593,12 @@ document.getElementById('fen').addEventListener('change', () => {
   } catch(e) {}
 });
 
+document.getElementById('move').addEventListener('click', () => {
+  search(searchDepth, side);
+  side ^= CHANGECOLOR;
+  drawBoard();
+});
+
 document.getElementById('undo').addEventListener('click', () => {
   if (!gameMoves.length) return;
   let lastMove = gameMoves[gameMoves.length-1];
@@ -1600,7 +1617,6 @@ parseFen(startFen, side);
 //parseFen('W:Wd2:Bd6', side);
 //printBoard();
 drawBoard();
-search(5, side);
 
 </script>
 </body>
