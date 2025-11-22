@@ -1,4 +1,61 @@
+<!-- Vakhtan - Russian draughts engine -->
+<html lang="en" style="touch-action: none;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="bangladesh-checkers">
+<style>
+html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background-color: white; }
+body { padding: 0px; margin: 0px; font-family: monospace; font-size: 20px; background-color: white; }
+button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; background-color: white; color: black; }
+.highlight { box-shadow: inset 0px 0px 10px 10px #ff0; }
+</style>
+</head>
+<body>
+<div id="game-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center;  width: 100%; height: 100%;">
+<div id="board"></div>
+<div id="buttons" style="display: flex; justify-content: center; gap: 1px; margin-top: 10px;">
+<button onclick="window.location.reload();">Play</button>
+<button onclick="ai ^= 1; alert('AI is now ' + (ai ? 'on' : 'off'));">AI</button>
+<button id="undo">Undo</button>
+<button id="move">Move</button>
+<button id="flip">Flip</button>
+</div>
+</div>
 <script>
+let width = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
+let size = parseInt(width / (window.innerWidth > window.innerHeight ? 10 : 8.2 ));
+let radius = size / 3;
+let flip = 0;
+var clickLock = 0;
+var userSrc, userDst;
+
+let blackMan = `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
+  ${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="white" stroke-width="2"/><circle cx="${size / 2}"
+  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="white" stroke-width="2"/></svg>
+`;
+
+let whiteMan = `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
+  ${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="black" stroke-width="2"/><circle cx="${size / 2}" 
+  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="black" stroke-width="2"/></svg>
+`;
+
+let whiteKing = `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
+  ${size / 2}" cy="${size / 2}" r="${radius}" fill="white" stroke="#222" stroke-width="2"/><circle cx="${size / 2}" 
+  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="#222" stroke-width="6"/></svg>
+`;
+
+let blackKing = `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="black circle"><circle cx="
+  ${size / 2}" cy="${size / 2}" r="${radius}" fill="black" stroke="white" stroke-width="2"/><circle cx="${size / 2}" 
+  cy="${size / 2}" r="${radius-(radius/2)}" fill="none" stroke="white" stroke-width="6"/></svg>
+`;
+
+let emptySq = '<span style=\'visibility:hidden\'>' + whiteMan + '</span>';
+
 const OCCUPIED = 0
 const WHITE = 1
 const BLACK = 2
@@ -12,23 +69,18 @@ const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var nodes = 0;
+var ply = 0;
 
 const pieceScores = [0, 0, 0, 0, 0, 200, -200, 0, 0, 400, -400, 0, 0, 0, 0, 0, 0];
-const pst = [
-  0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0,
-  5, 5, 5, 0, 0,
-  9, 9, 0, 0, 9,
-  9, 0, 0, 5, 5,
-  5, 0, 0, 0, 0,
-  0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0,
-  0, 0
-]
 
-// 20, 21, 24, 25     +9
-// 15, 16, 17, 28, 29, 30  +5
+const pst = [
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 5, 5, 5, 0, 0,
+  9, 9, 0, 0, 9, 9, 0, 0, 5, 5,
+  5, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0
+];
+
 const testPositions = [
   'W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1',
   'W:Wd6,a3,g3,f2,h2,c1,g1:Bb8,f8,h8,b6,f6,h6,h4:H0:F1',
@@ -78,8 +130,6 @@ const sq2coord = {
   37: 'g1', 38: 'e1', 39: 'c1', 40: 'a1'
 }
 
-var ply = 0;
-
 function printBoard() {
   brd2dsp();
   let boardStr = '';
@@ -93,10 +143,8 @@ function printBoard() {
   console.log(boardStr);
 }
 
-function clearDisplay() {
-  for (let row = 0; row < 8; row++)
-    for (let col = 0; col < 8; col++)
-      board[row][col] = FREE;
+function printMoveList(moveList, n) {
+  for (let i = 0; i < n; i++) console.log(move2str(moveList[i]));
 }
 
 function move2str(move) {
@@ -112,6 +160,51 @@ function move2str(move) {
   let c = '-';
   if(move.l > 2) c = 'x';
   return m2coord[src]+c+m2coord[dst];
+}
+
+function parseFen(fen, color) {
+  b = new Array(46).fill(0);
+  board = new Array(8).fill(0).map(() => new Array(8).fill(0));
+  color[0] = fen[0] == 'W' ? WHITE : BLACK;
+  let i = 2;
+  let pce = WHITE;
+  let rank = MAN;
+  while (i < fen.length) {
+    let c = fen[i];
+    var row, col;
+    switch(c) {
+      case 'B': pce = BLACK; break;
+      case 'K': rank = KING;
+      case 'a': row = 7; break;
+      case 'b': row = 6; break;
+      case 'c': row = 5; break;
+      case 'd': row = 4; break;
+      case 'e': row = 3; break;
+      case 'f': row = 2; break;
+      case 'g': row = 1; break;
+      case 'h': row = 0; break;
+      case '1': col = 7; break;
+      case '2': col = 6; break;
+      case '3': col = 5; break;
+      case '4': col = 4; break;
+      case '5': col = 3; break;
+      case '6': col = 2; break;
+      case '7': col = 1; break;
+      case '8': col = 0; break;
+      case ':':
+      case ',':
+        board[row][col] = pce|rank;
+        rank = MAN;
+        break;
+    } i++;
+    if (i == fen.length) board[row][col] = pce|rank;
+  } dsp2brd();
+}
+
+function clearDisplay() {
+  for (let row = 0; row < 8; row++)
+    for (let col = 0; col < 8; col++)
+      board[row][col] = FREE;
 }
 
 function dsp2brd() {
@@ -149,10 +242,6 @@ function createMoveList() {
   let moveList = [];
   for (let i = 0; i < MAXMOVES; i++) moveList.push(createMove());
   return moveList;
-}
-
-function printMoveList(moveList, n) {
-  for (let i = 0; i < n; i++) console.log(move2str(moveList[i]));
 }
 
 function generateQuiets(moveList, color) {
@@ -1296,6 +1385,53 @@ function undoMove(move) {
   } ply--;
 }
 
+function perftDriver(depth, color) {
+  if (depth == 0) { nodes++; return; }
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]); //printBoard();
+    perftDriver(depth-1, color^CHANGECOLOR);
+    undoMove(moveList[i]); //printBoard();
+  }
+}
+
+function perftTest(depth, color) {
+  nodes = 0;
+  console.log('\n    Performance test:\n\n');
+  printBoard();
+  console.log('Side to move: ' + (color == 2 ? 'black' : 'white'));
+  let resultString = '';
+  let startTime = Date.now();
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]);
+    let cumNodes = nodes;
+    perftDriver(depth-1, color^CHANGECOLOR);
+    undoMove(moveList[i]);
+    let oldNodes = nodes - cumNodes;
+    console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
+  } resultString += '\n    Time: ' + (Date.now() - startTime) + ' ms';
+  resultString += '\n   Depth: ' + depth;
+  resultString += '\n   Nodes: ' + nodes;
+  console.log(resultString);
+}
+
+function perftTestSuit(depth) {
+  let color = [0];
+  parseFen(startFen, color);
+  perftTest(depth, color);
+  for (let fen of testPositions) {
+    parseFen(fen, color);
+    perftTest(depth, color);
+  }
+}
+
 function evaluate(color) {
   let score = 0;
   for (let sq = 5; sq <= 40; sq++) {
@@ -1353,100 +1489,54 @@ function search(depth, color) {
   return { bestScore, bestMove };
 }
 
-function perftDriver(depth, color) {
-  if (depth == 0) { nodes++; return; }
-  let n, moveList;
-  moveList = createMoveList();
-  n = generateCaptures(moveList, color);
-  if (!n) n = generateQuiets(moveList, color);
-  for (let i = 0; i < n; i++) {
-    makeMove(moveList[i]); //printBoard();
-    perftDriver(depth-1, color^CHANGECOLOR);
-    undoMove(moveList[i]); //printBoard();
-  }
+function drawBoard() {
+  brd2dsp();
+  let boardHTML = `<table align="center" cellspacing="0" `;
+  boardHTML += `style=" -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;`;
+  boardHTML += `user-select: none; -o-user-select: none;`;
+  boardHTML += `unselectable="on" onselectstart="return false;" onmousedown="return false;"`;
+  for (let row = 0; row < 8; row++) {
+    boardHTML+= '<tr>';
+    for (let col = 0; col < 8; col++) {
+      let file, rank;
+      if (flip) {
+        file = 7-col;
+        rank = 7-row;
+      } else {
+        file = col;
+        rank = row;
+      } let piece;
+      let sq = (7-file) + ':' + rank;
+      let pce = board[7-file][rank];
+      switch(pce) {
+        case 5: piece = whiteMan; break;
+        case 6: piece = blackMan; break;
+        case 9: piece = whiteKing; break;
+        case 10: piece = blackKing; break;
+        case 16: piece = emptySq; break;
+      } boardHTML+= '<td align="center" id="' + sq +
+        '"bgcolor="#' + ( ((col + row) % 2) ? '999999' : 'eef2e1') + '" style="width: ' + size +
+        'px; height: ' + size + 'px; padding: 0px; font-size: ' + (size/2) + 'px; border: 1px solid black;"' +
+        ' onclick="userMove(this.id)">' + piece + '</td>';
+    } boardHTML+= '</tr>';
+  } boardHTML+= '</table>';
+  document.getElementById('board').innerHTML = boardHTML;
+  document.getElementById('buttons').style.width = (document.getElementById('board').offsetWidth) + 'px';
 }
 
-function perftTest(depth, color) {
-  nodes = 0;
-  console.log('\n    Performance test:\n\n');
-  printBoard();
-  console.log('Side to move: ' + (color == 2 ? 'black' : 'white'));
-  let resultString = '';
-  let startTime = Date.now();
-  let n, moveList;
-  moveList = createMoveList();
-  n = generateCaptures(moveList, color);
-  if (!n) n = generateQuiets(moveList, color);
-  for (let i = 0; i < n; i++) {
-    makeMove(moveList[i]);
-    let cumNodes = nodes;
-    perftDriver(depth-1, color^CHANGECOLOR);
-    undoMove(moveList[i]);
-    let oldNodes = nodes - cumNodes;
-    console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
-  } resultString += '\n    Time: ' + (Date.now() - startTime) + ' ms';
-  resultString += '\n   Depth: ' + depth;
-  resultString += '\n   Nodes: ' + nodes;
-  console.log(resultString);
-}
-
-function perftTestSuit(depth) {
-  let color = [0];
-  parseFen(startFen, color);
-  perftTest(depth, color);
-  for (let fen of testPositions) {
-    parseFen(fen, color);
-    perftTest(depth, color);
-  }
-}
-
-function parseFen(fen, color) {
-  b = new Array(46).fill(0);
-  board = new Array(8).fill(0).map(() => new Array(8).fill(0));
-  color[0] = fen[0] == 'W' ? WHITE : BLACK;
-  let i = 2;
-  let pce = WHITE;
-  let rank = MAN;
-  while (i < fen.length) {
-    let c = fen[i];
-    var row, col;
-    switch(c) {
-      case 'B': pce = BLACK; break;
-      case 'K': rank = KING;
-      case 'a': row = 7; break;
-      case 'b': row = 6; break;
-      case 'c': row = 5; break;
-      case 'd': row = 4; break;
-      case 'e': row = 3; break;
-      case 'f': row = 2; break;
-      case 'g': row = 1; break;
-      case 'h': row = 0; break;
-      case '1': col = 7; break;
-      case '2': col = 6; break;
-      case '3': col = 5; break;
-      case '4': col = 4; break;
-      case '5': col = 3; break;
-      case '6': col = 2; break;
-      case '7': col = 1; break;
-      case '8': col = 0; break;
-      case ':':
-      case ',':
-        board[row][col] = pce|rank;
-        rank = MAN;
-        break;
-      
-    } i++;
-    if (i == fen.length) board[row][col] = pce|rank;
-  } dsp2brd();
+function userMove(coord) {
+  alert (coord)
 }
 
 let color = [0];
 parseFen(startFen, color);
-printBoard();
+//printBoard();
+drawBoard();
 search(5, color);
 
 </script>
-
+</body>
+</html>
 
 
 
