@@ -14,6 +14,7 @@ button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; ba
 <body>
 <div id="game-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center;  width: 100%; height: 100%;">
 <div id="board"></div>
+<input id="fen" type="text" spellcheck="false" value="W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6"/>
 <div id="buttons" style="display: flex; justify-content: center; gap: 1px; margin-top: 10px;">
 <button onclick="window.location.reload();">Play</button>
 <button onclick="ai ^= 1; alert('AI is now ' + (ai ? 'on' : 'off'));">AI</button>
@@ -1524,7 +1525,9 @@ function drawBoard() {
     } boardHTML+= '</tr>';
   } boardHTML+= '</table>';
   document.getElementById('board').innerHTML = boardHTML;
-  document.getElementById('buttons').style.width = (document.getElementById('board').offsetWidth) + 'px';
+  let boardWidth = (document.getElementById('board').offsetWidth) + 'px';
+  document.getElementById('fen').style = 'width: ' + boardWidth + '; font-size: inherit; text-align: center; height: 50px; margin-top: 10px;';
+  document.getElementById('buttons').style.width = boardWidth;
 }
 
 function userMove(coord) {
@@ -1570,6 +1573,13 @@ function userMove(coord) {
     //setTimeout(function() { search(searchDepth) }, 100);
   }
 }
+
+document.getElementById('fen').addEventListener('change', () => {
+  try {
+    parseFen(document.getElementById('fen').value, side);
+    drawBoard();
+  } catch(e) {}
+});
 
 document.getElementById('undo').addEventListener('click', () => {
   if (!gameMoves.length) return;
