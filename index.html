@@ -1449,47 +1449,48 @@ function evaluate(color) {
   } return (color[0] == WHITE) ? score : -score;
 }
 
+function quiescence(color) {
+  let standPat = evaluate(color);
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  let bestScore = standPat;
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]);
+    let score = -quiescence(color^CHANGECOLOR);
+    undoMove(moveList[i]);
+    if (score > bestScore) bestScore = score;
+  } nodes++;
+  return bestScore;
+}
+  
+function negamax(depth, originalDepth, color) {
+  if (depth === 0) return quiescence(color);
+  let bestScore = -Infinity;
+  let n, moveList;
+  moveList = createMoveList();
+  n = generateCaptures(moveList, color);
+  if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    makeMove(moveList[i]);
+    let cumNodes = nodes;
+    let score = -negamax(depth - 1, originalDepth, color&CHANGECOLOR);
+    undoMove(moveList[i]);
+    let oldNodes = nodes - cumNodes;
+    if (depth == originalDepth) console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
+    if (score > bestScore) {
+      bestScore = score;
+      if (depth === originalDepth) bestMove = moveList[i];
+    }
+  } return bestScore;
+}
+  
 function search(depth, color) {
   nodes = 0;
   let bestMove = null;
   const originalDepth = depth;
   console.log('Searching root moves:');
-  
-  function quiescence() {
-    nodes++;
-    let standPat = evaluate(color);
-    let n, moveList;
-    moveList = createMoveList();
-    n = generateCaptures(moveList, color);
-    let bestScore = standPat;
-    for (let i = 0; i < n; i++) {
-      makeMove(moveList[i]);
-      let score = -quiescence();
-      undoMove(moveList[i]);
-      if (score > bestScore) bestScore = score;
-    } return bestScore;
-  }
-  
-  function negamax(depth) {
-    if (depth === 0) return quiescence(color);
-    let bestScore = -Infinity;
-    let n, moveList;
-    moveList = createMoveList();
-    n = generateCaptures(moveList, color);
-    if (!n) n = generateQuiets(moveList, color);
-    for (let i = 0; i < n; i++) {
-      makeMove(moveList[i]);
-      let cumNodes = nodes;
-      let score = -negamax(depth - 1);
-      undoMove(moveList[i]);
-      let oldNodes = nodes - cumNodes;
-      if (depth == originalDepth) console.log('Move: ' + move2str(moveList[i]) + ', nodes: ' + oldNodes);
-      if (score > bestScore) {
-        bestScore = score;
-        if (depth === originalDepth) bestMove = moveList[i];
-      }
-    } return bestScore;
-  } const bestScore = negamax(depth);
+  const bestScore = negamax(depth, originalDepth, color);
   return { bestScore, bestMove };
 }
 
@@ -1599,7 +1600,7 @@ parseFen(startFen, side);
 //parseFen('W:Wd2:Bd6', side);
 //printBoard();
 drawBoard();
-//search(5, color);
+search(5, side);
 
 </script>
 </body>
