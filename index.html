@@ -1456,7 +1456,7 @@ function evaluate(color) {
       case 9: score += pst[sq]; break;
       case 10: score -= pst[sq]; break;
     }
-  } return (color[0] == WHITE) ? score : -score;
+  } return (color == WHITE) ? score : -score;
 }
 
 function quiescence(color) {
@@ -1484,7 +1484,7 @@ function negamax(depth, originalDepth, color, bestMove) {
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
     let cumNodes = nodes;
-    let score  = -negamax(depth - 1, originalDepth, color&CHANGECOLOR, bestMove);
+    let score  = -negamax(depth - 1, originalDepth, color^CHANGECOLOR, bestMove);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
     if (depth == originalDepth)
