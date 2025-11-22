@@ -1487,11 +1487,12 @@ function quiescence(alpha, beta, color) {
   
 function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
   if (depth === 0) return quiescence(alpha, beta, color);
+  let localPly = originalDepth - depth;
   let n, moveList;
   moveList = createMoveList();
   n = generateCaptures(moveList, color);
   if (!n) n = generateQuiets(moveList, color);
-  if (!n) return -WIN + ply;
+  if (!n) return -WIN + localPly;
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
     let cumNodes = nodes;
@@ -1516,7 +1517,14 @@ function search(depth, color) {
   print('side ' + (color == 2 ? 'black' : 'white'));
   print('thinking...');
   bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
-  print('best ' + move2str(bestMove[0]) + ' score ' + bestScore + ' nodes ' + nodes);
+  let printScore = '';
+  let printMove = move2str(bestMove[0]) != 'b8-b8' ? `best ${move2str(bestMove[0])}` : 'no moves';
+  if (Math.abs(bestScore) >= 9000) {
+    let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
+    if (bestScore > 0) printScore = ` win in ${mateIn} plies`;
+    else printScore = ` lost in ${mateIn} plies`;
+  } else printScore = ` score ${bestScore}`;
+  print(printMove + printScore + ' nodes ' + nodes);
   return bestMove[0];
 }
 
