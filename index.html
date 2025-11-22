@@ -1627,7 +1627,7 @@ document.getElementById('play').addEventListener('click', () => {
 });
 
 document.getElementById('edit').addEventListener('click', () => {
-  edit ^= 1; alert('Edit mode is now ' + (edit ? 'on' : 'off'));
+  edit ^= 1; alert('Edit mode is ' + (edit ? 'on' : 'off'));
 });
 
 document.getElementById('undo').addEventListener('click', () => {
@@ -1649,9 +1649,9 @@ document.getElementById('flip').addEventListener('click', () => {
   drawBoard();
 });
 
-parseFen(startFen, side);
-//parseFen('W:Wd2:Bd6', side);
-//printBoard();
+//parseFen(startFen, side);
+searchDepth = 11;
+parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
 drawBoard();
 
 </script>
