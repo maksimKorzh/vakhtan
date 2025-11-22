@@ -1501,7 +1501,7 @@ function search(depth, color) {
   let bestMove = [createMove()];
   let bestScore = null;
   const originalDepth = depth;
-  print('side ' + (side[0] == 2 ? 'black' : 'white'));
+  print('side ' + (color == 2 ? 'black' : 'white'));
   bestScore = negamax(depth, originalDepth, color, bestMove);
   print('best ' + move2str(bestMove[0]) + ' score ' + bestScore + ' nodes ' + nodes);
   return bestMove[0];
@@ -1509,7 +1509,7 @@ function search(depth, color) {
 
 function makeEngineMove() {
   if (edit) return;
-  let move = search(searchDepth, side);
+  let move = search(searchDepth, side[0]);
   makeMove(move);
   gameMoves.push(move);
   side[0] ^= CHANGECOLOR;
