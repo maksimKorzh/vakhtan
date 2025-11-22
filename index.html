@@ -68,6 +68,9 @@ const MAXMOVES = 50;
 const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
+var side = [];
+var legalMoves = [];
+var gameMoves = [];
 var nodes = 0;
 var ply = 0;
 
@@ -1525,14 +1528,58 @@ function drawBoard() {
 }
 
 function userMove(coord) {
-  alert (coord)
+  let row = parseInt(coord.split(':')[0]);
+  let col = parseInt(coord.split(':')[1]);
+  if (clickLock && board[row][col] != 16) clickLock = 0;
+  if(!clickLock && board[row][col] != 16) {
+    if ((board[row][col] & CHANGECOLOR) != side) return;
+    for (let row = 0; row < 8; row++)
+      for (let col = 0; col < 8; col++)
+        document.getElementById(row+':'+col).classList.remove('highlight');
+    document.getElementById(coord).classList.add('highlight');
+    legalMoves = [];
+    let color = board[row][col] & CHANGECOLOR;
+    let n, moveList;
+    moveList = createMoveList();
+    n = generateCaptures(moveList, color);
+    if (!n) n = generateQuiets(moveList, color);
+    let src = 'abcdefgh'[7-row] + '12345678'[7-col];
+    for (let i = 0; i < n; i++) {
+      let m = move2str(moveList[i]).replace('x', '-');
+      if (src == m.split('-')[0]) {
+        let dst = m.split('-')[1];
+        let dr = 8-parseInt(dst[1]);
+        let dc = 7-'abcdefgh'.indexOf(dst[0]);
+        legalMoves.push({'dst': dst, 'm': moveList[i]});
+        document.getElementById(dc + ':' + dr).classList.add('highlight');
+        usrSrc = [row, col];
+      }
+    } clickLock = 1;
+  }
+  if(clickLock && board[row][col] == 16) {
+    let dst = 'abcdefgh'[7-row] + '12345678'[7-col];
+    for (let move of legalMoves) {
+      if (move.dst == dst) {
+        makeMove(move.m);
+        side ^= CHANGECOLOR;
+        break;
+      }
+    } clickLock = 0;
+    drawBoard();
+    //setTimeout(function() { search(searchDepth) }, 100);
+  }
 }
 
-let color = [0];
-parseFen(startFen, color);
+document.getElementById('flip').addEventListener('click', () => {
+  flip ^= 1;
+  drawBoard();
+});
+
+parseFen(startFen, side);
+//parseFen('W:Wd2:Bd6', side);
 //printBoard();
 drawBoard();
-search(5, color);
+//search(5, color);
 
 </script>
 </body>
