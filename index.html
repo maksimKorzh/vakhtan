@@ -1598,11 +1598,11 @@ function userMove(coord) {
         makeMove(move.m);
         gameMoves.push(move.m);
         side[0] ^= CHANGECOLOR;
+        setTimeout(function() { makeEngineMove(); }, 100);
         break;
       }
     } clickLock = 0;
     drawBoard();
-    setTimeout(function() { makeEngineMove(); }, 100);
   }
 }
 
