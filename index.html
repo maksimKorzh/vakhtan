@@ -22,7 +22,7 @@ button, select { width: 100%; height: 60px; font-size: inherit; font-family: inh
   <option value='7' selected>EASY</option>
   <option value='9'>MESS</option>
   <option value='11'>HARD</option>
-  <option value='13'>EPIC</option>
+  <option value='17'>EPIC</option>
 </select>
 <button id="play">PLAY</button>
 <button id="edit">EDIT</button>
@@ -1510,7 +1510,7 @@ function quiescence(alpha, beta, color) {
     makeMove(moveList[i]);
     let score = -quiescence(-beta, -alpha, color^CHANGECOLOR);
     undoMove(moveList[i]);
-    if (score >= beta) return score; // fail-soft beta
+    if (score >= beta) return score;
     if (score > alpha) alpha = score;
   } return alpha;
 }
@@ -1530,6 +1530,9 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
       else if (killerMoves[MAXPLY + ply].l == moveList[i].l &&
           killerMoves[MAXPLY + ply].m[0] == moveList[i].m[0] &&
           killerMoves[MAXPLY + ply].m[1] == moveList[i].m[1]) moveList[i].score = 8000;
+      else if (bestMove[0].l == moveList[i].l &&
+               bestMove[0].m[0] == moveList[i].m[0] &&
+               bestMove[0].m[1] == moveList[i].m[1]) moveList[i].score = 10000;
     }
   }
   if (!n) return -WIN + localPly;
@@ -1557,21 +1560,23 @@ function search(depth, color) {
   let bestMove = [createMove()];
   let bestScore = null;
   const originalDepth = depth;
-  bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
-  let printScore = '';
-  let printMove = move2str(bestMove[0]);
-  let printNodes = ' nodes ' + nodes;
-  let printDepth = ' depth ' + depth;
-  if (Math.abs(bestScore) >= 9000) {
-    let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
-    if (bestScore > 0) printScore = ` wins in ${mateIn} plies`;
-    else printScore = ` loses in ${mateIn} plies`;
-  } else printScore = ` score ${bestScore}`;
-  if (printScore.includes('in')) {
-    printMove = (color == 2 ? 'black' : 'white');
-    printNodes = '';
-    printDepth = '';
-  } print(printMove + printDepth + printScore + printNodes);
+  for (let currentDepth = 1; currentDepth <= depth; currentDepth++) {
+    bestScore = negamax(currentDepth, -INFINITY, INFINITY, originalDepth, color, bestMove);
+    let printScore = '';
+    let printMove = move2str(bestMove[0]);
+    let printNodes = ' nodes ' + nodes;
+    let printDepth = ' depth ' + currentDepth;
+    if (Math.abs(bestScore) >= 9000) {
+      let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
+      if (bestScore > 0) printScore = ` wins in ${mateIn} plies`;
+      else printScore = ` loses in ${mateIn} plies`;
+    } else printScore = ` score ${bestScore}`;
+    if (printScore.includes('in')) {
+      printMove = (color == 2 ? 'black' : 'white');
+      //printNodes = '';
+      //printDepth = '';
+    } print(printMove + printDepth + printScore + printNodes);
+  }
   return bestMove[0];
 }
 
