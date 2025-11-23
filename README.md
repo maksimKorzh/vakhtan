@@ -11,5 +11,5 @@ https://maksimkorzh.github.io/vakhtan/
  - Killer move ordering
  - Iterative deepening
  - Material + PST evaluation
- - Own GUI
  - Load position from FEN
+ - Own GUI
