@@ -81,12 +81,15 @@ const KING = 8;
 const FREE = 16;
 const CHANGECOLOR = 3;
 const MAXMOVES = 50;
+const MAXPLY = 64;
 const INFINITY = 100000;
 const WIN = 10000;
 
 const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
+var killerMoves = new Array(2 * MAXPLY);
+var historyMoves = new Array(4 * 128);
 var side = [];
 var legalMoves = [];
 var gameMoves = [];
@@ -265,7 +268,7 @@ function brd2dsp() {
 }
 
 function createMove() {
-  return {l: 0, m: new Array(10).fill(0), path: new Array(10).fill(0)};
+  return {l: 0, m: new Array(10).fill(0), path: new Array(10).fill(0), score: 0};
 }
 
 function createMoveList() {
@@ -1500,6 +1503,11 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
   moveList = createMoveList();
   n = generateCaptures(moveList, color);
   if (!n) n = generateQuiets(moveList, color);
+  for (let i = 0; i < n; i++) {
+    if (moveList[i].l <= 2) {
+      //if (killerMoves[ply].l == moveList[i].l) console.log('found killer')
+    }
+  }
   if (!n) return -WIN + localPly;
   for (let i = 0; i < n; i++) {
     makeMove(moveList[i]);
@@ -1508,13 +1516,27 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
     if (score > alpha) {
-      if (score >= beta) return beta;
-      alpha = score;
+      if (score >= beta) {
+        if (moveList[i].l <= 2) {
+          killerMoves[MAXPLY + ply] = killerMoves[ply];
+          killerMoves[ply] = moveList[i];
+        } return beta;
+      } alpha = score;
       if (depth === originalDepth) bestMove[0] = structuredClone(moveList[i]);
     }
   } return alpha;
 }
-  
+
+function clearSearch() {
+  // reset nodes counter
+  nodes = 0;
+  ply = 0;
+   
+  //for (let index = 0; index < pvTable.length; index++) pvTable[index] = 0;
+  //for (let index = 0; index < pvLength.length; index++) pvLength[index] = 0;
+  for (let index = 0; index < killerMoves.length; index++) killerMoves[index] = 0;
+  for (let index = 0; index < historyMoves.length; index++) historyMoves[index] = 0;
+}  
 function search(depth, color) {
   nodes = 0;
   let bestMove = [createMove()];
@@ -1522,25 +1544,25 @@ function search(depth, color) {
   const originalDepth = depth;
   bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
   let printScore = '';
-  let printMove = move2str(bestMove[0]) != 'b8-b8' ? `move ${move2str(bestMove[0])}` : 'move none';
+  let printMove = move2str(bestMove[0]);
   let printNodes = ' nodes ' + nodes;
   let printDepth = ' depth ' + depth;
   if (Math.abs(bestScore) >= 9000) {
     let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
-    if (bestScore > 0) printScore = ` win in ${mateIn} plies`;
-    else printScore = ` lost in ${mateIn} plies`;
+    if (bestScore > 0) printScore = ` wins in ${mateIn} plies`;
+    else printScore = ` loses in ${mateIn} plies`;
   } else printScore = ` score ${bestScore}`;
   if (printScore.includes('in')) {
     printMove = (color == 2 ? 'black' : 'white');
     printNodes = '';
     printDepth = '';
-  }
-  print(printMove + printScore + printDepth + printNodes);
+  } print(printMove + printDepth + printScore + printNodes);
   return bestMove[0];
 }
 
 function makeEngineMove() {
   if (edit) return;
+  clearSearch();
   let move = search(searchDepth, side[0]);
   makeMove(move);
   gameMoves.push(move);
