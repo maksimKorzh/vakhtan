@@ -22,7 +22,7 @@ button, select { width: 100%; height: 60px; font-size: inherit; font-family: inh
   <option value='7' selected>EASY</option>
   <option value='9'>MESS</option>
   <option value='11'>HARD</option>
-  <option value='17'>EPIC</option>
+  <option value='13'>EPIC</option>
 </select>
 <button id="play">PLAY</button>
 <button id="edit">EDIT</button>
@@ -1474,12 +1474,7 @@ function sortMoves(currentCount, moveList) {
 }
 
 function clearSearch() {
-  // reset nodes counter
-  nodes = 0;
-  ply = 0;
-   
-  //for (let index = 0; index < pvTable.length; index++) pvTable[index] = 0;
-  //for (let index = 0; index < pvLength.length; index++) pvLength[index] = 0;
+  nodes = 0; ply = 0;
   for (let index = 0; index < killerMoves.length; index++) killerMoves[index] = 0;
 }
 
@@ -1724,9 +1719,7 @@ document.getElementById('flip').addEventListener('click', () => {
 });
 
 parseFen(startFen, side);
-parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
 drawBoard();
-
 
 </script>
 </body>
