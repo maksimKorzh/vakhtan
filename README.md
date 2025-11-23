@@ -1,5 +1,5 @@
 # Vakhtan
-Russian draughts engine with GUI written in pure JavaScripti<br>
+Russian draughts engine with GUI written in pure JavaScript<br>
 (Программа названа в честь <a href="https://www.youtube.com/@Vakhterov">Владимира Вахтерова</a>)
 
 # Play now
