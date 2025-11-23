@@ -6,8 +6,8 @@
 <base href="bangladesh-checkers">
 <style>
 html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background-color: white; }
-body { padding: 0px; margin: 0px; font-family: monospace; font-size: 20px; background-color: white; }
-button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; background-color: white; color: black; }
+body { padding: 0px; margin: 0px; font-family: monospace; font-size: 30px; background-color: white; }
+button, select { width: 100%; height: 60px; font-size: inherit; font-family: inherit; background-color: white; color: black; }
 .highlight { box-shadow: inset 0px 0px 10px 10px #ff0; }
 </style>
 </head>
@@ -16,11 +16,19 @@ button { width: 100%; height: 80px; font-size: inherit; font-family: inherit; ba
 <div id="board"></div>
 <input id="fen" type="text" spellcheck="false" value="W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6"/>
 <div id="buttons" style="display: flex; justify-content: center; gap: 1px; margin-top: 10px;">
-<button id="play"">Play</button>
-<button id="edit"">Edit</button>
-<button id="undo">Undo</button>
-<button id="move">Move</button>
-<button id="flip">Flip</button>
+<select id="depth">
+  <option value='3'>DUMB</option>
+  <option value='5'>NOOB</option>
+  <option value='7' selected>EASY</option>
+  <option value='9'>MESS</option>
+  <option value='11'>HARD</option>
+  <option value='13'>EPIC</option>
+</select>
+<button id="play">PLAY</button>
+<button id="edit">EDIT</button>
+<button id="undo">UNDO</button>
+<button id="move">MOVE</button>
+<button id="flip">FLIP</button>
 </div>
 <div id="out"></div>
 </div>
@@ -82,7 +90,7 @@ var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var side = [];
 var legalMoves = [];
 var gameMoves = [];
-var searchDepth = 5;
+var searchDepth = 7;
 var nodes = 0;
 var ply = 0;
 
@@ -1499,8 +1507,6 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
     let score  = -negamax(depth - 1, -beta, -alpha, originalDepth, color^CHANGECOLOR, bestMove);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
-    if (depth == originalDepth)
-      print('move ' + move2str(moveList[i]) + ' score ' + score + ' nodes ' + oldNodes);
     if (score > alpha) {
       if (score >= beta) return beta;
       alpha = score;
@@ -1514,16 +1520,22 @@ function search(depth, color) {
   let bestMove = [createMove()];
   let bestScore = null;
   const originalDepth = depth;
-  print('side ' + (color == 2 ? 'black' : 'white'));
   bestScore = negamax(depth, -INFINITY, INFINITY, originalDepth, color, bestMove);
   let printScore = '';
-  let printMove = move2str(bestMove[0]) != 'b8-b8' ? `best ${move2str(bestMove[0])}` : 'no moves';
+  let printMove = move2str(bestMove[0]) != 'b8-b8' ? `move ${move2str(bestMove[0])}` : 'move none';
+  let printNodes = ' nodes ' + nodes;
+  let printDepth = ' depth ' + depth;
   if (Math.abs(bestScore) >= 9000) {
     let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
     if (bestScore > 0) printScore = ` win in ${mateIn} plies`;
     else printScore = ` lost in ${mateIn} plies`;
   } else printScore = ` score ${bestScore}`;
-  print(printMove + printScore + ' nodes ' + nodes);
+  if (printScore.includes('in')) {
+    printMove = (color == 2 ? 'black' : 'white');
+    printNodes = '';
+    printDepth = '';
+  }
+  print(printMove + printScore + printDepth + printNodes);
   return bestMove[0];
 }
 
@@ -1629,11 +1641,18 @@ function userMove(coord) {
   }
 }
 
-document.getElementById('fen').addEventListener('change', () => {
-  try {
-    parseFen(document.getElementById('fen').value, side);
-    drawBoard();
-  } catch(e) {}
+document.getElementById('fen').addEventListener('keypress', (e) => {
+  if (e.key == 'Enter') {
+    try {
+      parseFen(document.getElementById('fen').value, side);
+      drawBoard();
+    } catch(e) {}
+  }
+});
+
+document.getElementById('depth').addEventListener('change', () => {
+  let newDepth = document.getElementById('depth').value;
+  searchDepth = parseInt(newDepth);
 });
 
 document.getElementById('play').addEventListener('click', () => {
@@ -1664,8 +1683,7 @@ document.getElementById('flip').addEventListener('click', () => {
 });
 
 parseFen(startFen, side);
-searchDepth = 9;
-//parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
+parseFen('W:Wa7,a5,b4,c3,f2,h2,g1:Bb8,c7,e7,g7,g5,f4,h4:H0:F1', side);
 drawBoard();
 </script>
 </body>
