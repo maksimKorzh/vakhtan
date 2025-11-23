@@ -1505,7 +1505,12 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
   if (!n) n = generateQuiets(moveList, color);
   for (let i = 0; i < n; i++) {
     if (moveList[i].l <= 2) {
-      //if (killerMoves[ply].l == moveList[i].l) console.log('found killer')
+      if (killerMoves[ply].l == moveList[i].l &&
+          killerMoves[ply].m[0] == moveList[i].m[0] &&
+          killerMoves[ply].m[1] == moveList[i].m[1]) moveList[i].score = 9000;
+      else if (killerMoves[MAXPLY + ply].l == moveList[i].l &&
+          killerMoves[MAXPLY + ply].m[0] == moveList[i].m[0] &&
+          killerMoves[MAXPLY + ply].m[1] == moveList[i].m[1]) moveList[i].score = 8000;
     }
   }
   if (!n) return -WIN + localPly;
