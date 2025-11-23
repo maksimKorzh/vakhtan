@@ -1558,20 +1558,22 @@ function search(depth, color) {
   nodes = 0;
   let bestMove = [createMove()];
   let bestScore = null;
+  let colorString = (color == 2 ? 'black' : 'white');
+  console.log('Searching for ' + colorString);
   for (let currentDepth = 1; currentDepth <= depth; currentDepth++) {
     let originalDepth = currentDepth;
     bestScore = negamax(currentDepth, -INFINITY, INFINITY, originalDepth, color, bestMove);
     let printScore = '';
-    let printMove = move2str(bestMove[0]);
+    let printMove = 'move ' + (move2str(bestMove[0]) == 'b8-b8' ? 'none' : move2str(bestMove[0]));
     let printNodes = ' nodes ' + nodes;
     let printDepth = ' depth ' + currentDepth;
     if (Math.abs(bestScore) >= 9000) {
       let winIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
-      if (bestScore > 0) printScore = ` wins in ${winIn} plies`;
-      else printScore = ` loses in ${winIn} plies`;
+      if (bestScore > 0) printScore = ` win in ${winIn} ply`;
+      else printScore = ` loss in ${winIn} ply`;
     } else printScore = ` score ${bestScore}`;
     console.log(printMove + printDepth + printScore + printNodes);
-    if (currentDepth == depth) print(printMove + printDepth + printScore + printNodes);
+    if (currentDepth == depth) print(printMove + printDepth + printScore);
   }
   return bestMove[0];
 }
@@ -1579,6 +1581,7 @@ function search(depth, color) {
 function makeEngineMove() {
   if (edit) return;
   clearSearch();
+  print('thinking...');
   let move = search(searchDepth, side[0]);
   makeMove(move);
   gameMoves.push(move);
