@@ -7,7 +7,7 @@
 <style>
 html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background-color: white; }
 body { padding: 0px; margin: 0px; font-family: monospace; font-size: 30px; background-color: white; }
-button, select { width: 100%; height: 60px; font-size: inherit; font-family: inherit; background-color: white; color: black; }
+button, select { width: 100%; height: 60px; font-size: inherit; font-family: inherit; }
 .highlight { box-shadow: inset 0px 0px 10px 10px #ff0; }
 </style>
 </head>
@@ -176,7 +176,6 @@ function print(msg) {
   let out =  document.getElementById('out');
   out.innerHTML += '&nbsp' + msg + '<br>';
   out.scrollTop = out.scrollHeight;
-  console.log(msg);
 }
 
 function move2str(move) {
@@ -1559,23 +1558,20 @@ function search(depth, color) {
   nodes = 0;
   let bestMove = [createMove()];
   let bestScore = null;
-  const originalDepth = depth;
   for (let currentDepth = 1; currentDepth <= depth; currentDepth++) {
+    let originalDepth = currentDepth;
     bestScore = negamax(currentDepth, -INFINITY, INFINITY, originalDepth, color, bestMove);
     let printScore = '';
     let printMove = move2str(bestMove[0]);
     let printNodes = ' nodes ' + nodes;
     let printDepth = ' depth ' + currentDepth;
     if (Math.abs(bestScore) >= 9000) {
-      let mateIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
-      if (bestScore > 0) printScore = ` wins in ${mateIn} plies`;
-      else printScore = ` loses in ${mateIn} plies`;
+      let winIn = (bestScore > 0) ? (WIN - bestScore) : (WIN + bestScore);
+      if (bestScore > 0) printScore = ` wins in ${winIn} plies`;
+      else printScore = ` loses in ${winIn} plies`;
     } else printScore = ` score ${bestScore}`;
-    if (printScore.includes('in')) {
-      printMove = (color == 2 ? 'black' : 'white');
-      //printNodes = '';
-      //printDepth = '';
-    } print(printMove + printDepth + printScore + printNodes);
+    console.log(printMove + printDepth + printScore + printNodes);
+    if (currentDepth == depth) print(printMove + printDepth + printScore + printNodes);
   }
   return bestMove[0];
 }
