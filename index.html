@@ -89,7 +89,6 @@ const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var killerMoves = new Array(2 * MAXPLY);
-var historyMoves = new Array(4 * 128);
 var side = [];
 var legalMoves = [];
 var gameMoves = [];
@@ -1483,7 +1482,6 @@ function clearSearch() {
   //for (let index = 0; index < pvTable.length; index++) pvTable[index] = 0;
   //for (let index = 0; index < pvLength.length; index++) pvLength[index] = 0;
   for (let index = 0; index < killerMoves.length; index++) killerMoves[index] = 0;
-  for (let index = 0; index < historyMoves.length; index++) historyMoves[index] = 0;
 }
 
 function evaluate(color) {
