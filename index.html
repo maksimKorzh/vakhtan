@@ -1576,7 +1576,6 @@ function search(depth, color) {
 function makeEngineMove() {
   if (edit) return;
   clearSearch();
-  print('thinking...');
   let move = search(searchDepth, side[0]);
   makeMove(move);
   gameMoves.push(move);
