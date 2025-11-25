@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <base href="bangladesh-checkers">
 <style>
-html { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: white; }
+html { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: black; }
 body { padding: 0px; margin: 0px; font-family: monospace; font-size: 30px; background-color: #111; color: #aaa; }
 button { -webkit-tap-highlight-color: transparent; width: 100%; height: 60px; padding: 3px; font-size: 22px; background-color: #111; color: #aaa; border: 1px solid #555; border-radius: 5px; cursor: pointer; }
 button:hover { background: #444; }
@@ -34,6 +34,7 @@ button:focus { outline: none }
 <button id="undo">UNDO</button>
 <button id="move">MOVE</button>
 <button id="flip">FLIP</button>
+<button id="view">VIEW</button>
 </div>
 <div id="out"></div>
 </div>
@@ -1720,6 +1721,19 @@ document.getElementById('move').addEventListener('click', () => {
 document.getElementById('flip').addEventListener('click', () => {
   flip ^= 1;
   drawBoard();
+});
+
+document.getElementById('view').addEventListener('click', () => {
+  const elem = document.documentElement; // fullscreen the whole page
+  if (!document.fullscreenElement) {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
 });
 
 parseFen(startFen, side);
