@@ -10,6 +10,7 @@ https://maksimkorzh.github.io/vakhtan/
  - Negamax search with alpha-beta pruning
  - Killer move ordering
  - Iterative deepening
+ - Transposition table
  - Material + PST evaluation
  - Load position from FEN
  - Own GUI
