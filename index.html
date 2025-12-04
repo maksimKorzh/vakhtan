@@ -90,17 +90,27 @@ const MAXMOVES = 50;
 const MAXPLY = 64;
 const INFINITY = 100000;
 const WIN = 10000;
+const HASH_EXACT = 0;
+const HASH_ALPHA = 1;
+const HASH_BETA = 2;
+const HASH_ENTRIES = 6710886; // 128Mb
+const NO_HASH_ENTRY = 100000;
+const START_FEN = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 
-const startFen = 'W:Wa3,c3,e3,g3,b2,d2,f2,h2,a1,c1,e1,g1:Bb8,d8,f8,h8,a7,c7,e7,g7,b6,d6,f6,h6';
 var b = new Array(46).fill(0);
 var board = new Array(8).fill(0).map(() => new Array(8).fill(0));
 var killerMoves = new Array(2 * MAXPLY);
 var side = [];
 var legalMoves = [];
 var gameMoves = [];
+var hashTable = [];
+var hashKey = 0;
 var searchDepth = 7;
 var nodes = 0;
 var ply = 0;
+var pieceKeys = new Array(2 * 46);
+var sideKey;
+var randomState = 1804289383;
 
 const pieceScores = [0, 0, 0, 0, 0, 200, -200, 0, 0, 400, -400, 0, 0, 0, 0, 0, 0];
 
@@ -236,6 +246,7 @@ function parseFen(fen, color) {
     } i++;
     if (i == fen.length) board[row][col] = pce|rank;
   } dsp2brd();
+  hashKey = generateHashKey();
 }
 
 function clearDisplay() {
@@ -1406,6 +1417,7 @@ function makeMove(move) {
     sq = (move.m[i] & 255);
     b[sq] = FREE;
   } ply++;
+  hashKey = generateHashKey();
 }
 
 function undoMove(move) {
@@ -1420,6 +1432,7 @@ function undoMove(move) {
     before = (move.m[i] >> 8);
     b[sq] = before;
   } ply--;
+  hashKey = generateHashKey();
 }
 
 function perftDriver(depth, color) {
@@ -1429,9 +1442,9 @@ function perftDriver(depth, color) {
   n = generateCaptures(moveList, color);
   if (!n) n = generateQuiets(moveList, color);
   for (let i = 0; i < n; i++) {
-    makeMove(moveList[i]); //printBoard();
+    makeMove(moveList[i]);
     perftDriver(depth-1, color^CHANGECOLOR);
-    undoMove(moveList[i]); //printBoard();
+    undoMove(moveList[i]);
   }
 }
 
@@ -1461,7 +1474,7 @@ function perftTest(depth, color) {
 
 function perftTestSuit(depth) {
   let color = [0];
-  parseFen(startFen, color);
+  parseFen(START_FEN, color);
   perftTest(depth, color);
   for (let fen of testPositions) {
     parseFen(fen, color);
@@ -1482,6 +1495,64 @@ function sortMoves(currentCount, moveList) {
 function clearSearch() {
   nodes = 0; ply = 0;
   for (let index = 0; index < killerMoves.length; index++) killerMoves[index] = 0;
+}
+  
+function random() {
+  let number = randomState;
+  number ^= number << 13;
+  number ^= number >> 17;
+  number ^= number << 5;
+  randomState = number;
+  return number;
+}
+
+function initRandomKeys() {
+  for (let i = 0; i < 11 * 46; i++) pieceKeys[i] = random();
+  sideKey = random();
+}
+
+function generateHashKey() {
+  var finalKey = 0;
+  for (var sq = 0; sq < 46; sq++) {
+    let piece = b[sq];
+    if (piece != FREE && piece != OCCUPIED) finalKey ^= pieceKeys[(piece * 46) + sq];
+  } if (side[0] == WHITE) finalKey ^= sideKey;
+  return finalKey;
+}
+
+function initHashTable() {
+  for (var index = 0; index < HASH_ENTRIES; index++) {
+    hashTable[index] = {
+      hashKey: 0,
+      depth: 0,
+      flag: 0,
+      score: 0,
+    }
+  }
+}
+
+function readHashEntry(alpha, beta, depth) {
+  var hashEntry = hashTable[(hashKey & 0x7fffffff) % HASH_ENTRIES];
+  if (hashEntry.hashKey == hashKey) {
+    if (hashEntry.depth >= depth) {
+      var score = hashEntry.score;
+      if (score < -WIN) score += ply;
+      if (score > WIN) score -= ply;
+      if (hashEntry.flag == HASH_EXACT) return score;
+      if ((hashEntry.flag == HASH_ALPHA) && (score <= alpha)) return alpha;
+      if ((hashEntry.flag == HASH_BETA) && (score >= beta)) return beta;
+    }
+  } return NO_HASH_ENTRY;
+}
+
+function writeHashEntry(score, depth, hashFlag) {
+  var hashEntry = hashTable[(hashKey & 0x7fffffff) % HASH_ENTRIES];
+  if (score < -WIN) score -= ply;
+  if (score > WIN) score += ply;
+  hashEntry.hashKey = hashKey;
+  hashEntry.score = score;
+  hashEntry.flag = hashFlag;
+  hashEntry.depth = depth;
 }
 
 function evaluate(color) {
@@ -1516,6 +1587,9 @@ function quiescence(alpha, beta, color) {
 }
   
 function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
+  var hashFlag = HASH_ALPHA;
+  var score;
+  if (ply &&  (score = readHashEntry(alpha, beta, depth)) != NO_HASH_ENTRY) return score;
   if (depth === 0) return quiescence(alpha, beta, color);
   let localPly = originalDepth - depth;
   let n, moveList;
@@ -1540,19 +1614,22 @@ function negamax(depth, alpha, beta, originalDepth, color, bestMove) {
     sortMoves(i, moveList);
     makeMove(moveList[i]);
     let cumNodes = nodes;
-    let score  = -negamax(depth - 1, -beta, -alpha, originalDepth, color^CHANGECOLOR, bestMove);
+    score  = -negamax(depth - 1, -beta, -alpha, originalDepth, color^CHANGECOLOR, bestMove);
     undoMove(moveList[i]);
     let oldNodes = nodes - cumNodes;
     if (score > alpha) {
+      hashFlag = HASH_EXACT;
+      if (depth === originalDepth) bestMove[0] = structuredClone(moveList[i]);
       if (score >= beta) {
+        writeHashEntry(beta, depth, HASH_BETA);
         if (moveList[i].l <= 2) {
           killerMoves[MAXPLY + ply] = killerMoves[ply];
           killerMoves[ply] = moveList[i];
         } return beta;
       } alpha = score;
-      if (depth === originalDepth) bestMove[0] = structuredClone(moveList[i]);
     }
-  } return alpha;
+  } writeHashEntry(alpha, depth, hashFlag);
+  return alpha;
 }
 
 function search(depth, color) {
@@ -1709,6 +1786,7 @@ document.getElementById('undo').addEventListener('click', () => {
   let lastMove = gameMoves[gameMoves.length-1];
   undoMove(lastMove);
   side[0] ^= CHANGECOLOR;
+  hashKey = generateHashKey();
   gameMoves.pop();
   drawBoard();
 });
@@ -1724,7 +1802,7 @@ document.getElementById('flip').addEventListener('click', () => {
 });
 
 document.getElementById('view').addEventListener('click', () => {
-  const elem = document.documentElement; // fullscreen the whole page
+  const elem = document.documentElement;
   if (!document.fullscreenElement) {
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
@@ -1736,7 +1814,10 @@ document.getElementById('view').addEventListener('click', () => {
   }
 });
 
-parseFen(startFen, side);
+initRandomKeys();
+initHashTable();
+parseFen(START_FEN, side);
+//parseFen(testPositions[0], side);
 drawBoard();
 
 </script>
